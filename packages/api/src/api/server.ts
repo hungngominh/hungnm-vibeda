@@ -48,6 +48,14 @@ export async function buildServer() {
     await protected_.register(entriesController);
   });
 
+  // Mascot GLBs — serve in both dev and production
+  const mascotPath = join(fileURLToPath(new URL('../../../../mascot', import.meta.url)));
+  await app.register(fastifyStatic, {
+    root: mascotPath,
+    prefix: '/mascot/',
+    decorateReply: false,
+  });
+
   // Static files: serve built React SPA in production
   const publicPath = join(__dirname, '../../public');
   try {
