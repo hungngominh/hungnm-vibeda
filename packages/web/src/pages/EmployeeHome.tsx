@@ -81,13 +81,26 @@ export function EmployeeHome() {
         display: 'flex', flexDirection: 'column', alignItems: 'center',
       }}>
 
-        {/* Mascot — tap to open picker */}
-        <div
-          onClick={() => setShowPicker(true)}
-          style={{ width: 220, height: 260, cursor: 'pointer', marginBottom: 24 }}
-          title="Tap để đổi linh vật"
-        >
-          <ModelViewer mascot={mascot} cameraControls />
+        {/* Mascot */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24, gap: 10 }}>
+          <div style={{ width: 220, height: 260 }}>
+            <ModelViewer mascot={mascot} cameraControls />
+          </div>
+          <button
+            onClick={() => setShowPicker(true)}
+            style={{
+              background: 'var(--container-lowest)',
+              border: '1.5px solid var(--outline-variant)',
+              borderRadius: 'var(--r-full)',
+              padding: '8px 20px',
+              fontSize: 14, fontWeight: 600,
+              color: 'var(--on-surface)',
+              cursor: 'pointer',
+              boxShadow: 'var(--shadow-soft)',
+            }}
+          >
+            🐾 Đổi linh vật
+          </button>
         </div>
 
         {/* Title */}
@@ -182,32 +195,20 @@ export function EmployeeHome() {
         </div>
       </main>
 
-      {/* Floating bottom nav */}
-      <div style={{
-        position: 'fixed', bottom: 24, left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex', gap: 8, padding: 12,
-        background: 'var(--container-lowest)',
-        borderRadius: 'var(--r-full)',
-        boxShadow: 'var(--shadow-pink)',
-        zIndex: 10,
-      }}>
-        {(['🏠', '☁️', '📅'] as const).map((icon, i) => (
-          <div
-            key={icon}
-            style={{
-              width: 56, height: 56,
-              borderRadius: 'var(--r-full)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 24, cursor: 'pointer',
-              background: i === 0 ? 'var(--primary-fixed)' : 'transparent',
-              transition: 'background 0.2s',
-            }}
-          >
-            {icon}
-          </div>
-        ))}
-      </div>
+
+      {/* Widget iframe overlay */}
+      <iframe
+        src="/widget"
+        style={{
+          position: 'fixed', inset: 0,
+          width: '100%', height: '100%',
+          border: 'none', zIndex: 100,
+          background: 'transparent',
+          pointerEvents: 'none',
+        }}
+        // @ts-expect-error allowtransparency is non-standard
+        allowTransparency="true"
+      />
 
       {showPicker && (
         <MascotPicker current={mascot} onSelect={applyMascot} onClose={() => setShowPicker(false)} />
