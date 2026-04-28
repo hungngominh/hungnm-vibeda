@@ -168,7 +168,8 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
     const maxLeft = Math.max(8, containerW - 8 - w);
     const clampedLeft = Math.max(8, Math.min(maxLeft, idealLeft));
     const left = clampedLeft + w / 2; // back to center coords (sẽ apply translate(-50%, ...))
-    const arrowOffsetPx = selected.x - clampedLeft; // arrow distance từ left edge của tooltip
+    const rawArrowOffset = selected.x - clampedLeft;
+    const arrowOffsetPx = Math.max(6, Math.min(w - 6, rawArrowOffset)); // giữ arrow trong khung tooltip, cách mép tối thiểu 6px
 
     return { top, left, transformY, flipDown, arrowOffsetPx };
   })();
