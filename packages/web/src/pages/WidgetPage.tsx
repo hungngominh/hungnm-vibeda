@@ -8,7 +8,7 @@ import { useCloudSocket } from '../hooks/useCloudSocket';
 import type { MascotKey } from '../components/ModelViewer';
 import type { WordItem } from '../components/WordCloud';
 
-const W = 120, H = 150; // bubble size
+const W = 80, H = 100; // bubble size
 
 function loadPos() {
   try {
