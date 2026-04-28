@@ -1,0 +1,12 @@
+{
+  "name": "moodaily",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:api": "pnpm --filter @moodaily/api dev",
+    "dev:web": "pnpm --filter @moodaily/web dev",
+    "build": "pnpm --filter @moodaily/web build && cp -r mascot packages/api/public/mascot",
+    "test": "pnpm --filter @moodaily/api test"
+  },
+  "packageManager": "pnpm@9.0.0"
+}
