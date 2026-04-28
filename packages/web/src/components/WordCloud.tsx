@@ -41,10 +41,16 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
       return;
     }
 
+    const compact = height < 200;
+    const baseSize = compact ? 9 : 13;
+    const rangeSize = compact ? 9 : 24;
+    const equalSize = compact ? 13 : 24;
+    const padding = compact ? 3 : 10;
+
     const maxCount = Math.max(...words.map(w => w.count));
     const minCount = Math.min(...words.map(w => w.count));
     const sizeScale = (count: number) =>
-      maxCount === minCount ? 24 : Math.round(13 + ((count - minCount) / (maxCount - minCount)) * 24);
+      maxCount === minCount ? equalSize : Math.round(baseSize + ((count - minCount) / (maxCount - minCount)) * rangeSize);
 
     const width = containerRef.current?.offsetWidth ?? 560;
 
@@ -57,7 +63,7 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
           color: WORD_COLORS[i % WORD_COLORS.length],
         }))
       )
-      .padding(10)
+      .padding(padding)
       .rotate(() => (Math.random() > 0.8 ? 90 : 0))
       .font('Plus Jakarta Sans')
       .fontSize((d: D3Word) => d.size ?? 16)
