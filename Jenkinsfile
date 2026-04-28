@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME       = 'hungnm-vibeda'
         CONTAINER_NAME   = 'hungnm-vibeda'
-        GG_CHAT_WEBHOOK  = 'https://chat.googleapis.com/v1/spaces/AAQAyJg5xoU/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=bPFiBiw7I06p8wFaPtA0Jr300iUTinPept8BH77KAik'
+        GG_CHAT_WEBHOOK  = 'https://chat.googleapis.com/v1/spaces/AAQAkY-qUt8/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UdjB1Zx2Va3LFMqf9YJLC8R_PcddCUQzJViK6gHOmd8'
         JENKINS_URL_PUBLIC = 'http://42.119.236.229:9090'
     }
 

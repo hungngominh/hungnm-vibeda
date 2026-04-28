@@ -16,7 +16,8 @@ export class MoodEntryService extends BaseService<MoodEntry, MoodEntryParam> {
     logger?: Logger,
   ) {
     super(executor, permissions, logger);
-    this.delegate = prisma.moodEntry;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.delegate = prisma.moodEntry as any;
   }
 
   protected buildNewEntity(_p: MoodEntryParam) {
@@ -49,7 +50,8 @@ export class MoodEntryService extends BaseService<MoodEntry, MoodEntryParam> {
     });
     for (const { id } of clusters) {
       const result = await this.executor.softDeleteAsync(
-        this.prisma.moodCluster,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.prisma.moodCluster as any,
         id,
         param.callerUsername,
       );

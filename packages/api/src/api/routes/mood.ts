@@ -39,12 +39,14 @@ export const moodRoutes: FastifyPluginAsync = async (app) => {
       req.log.error(err, 'AI extraction failed — saving entry without clusters');
     }
 
-    const entryResult = await executor.addAsync(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      prisma.moodEntry as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const exec = executor as any;
+    const entryResult = await exec.addAsync(
+      prisma.moodEntry,
       { rawText: body.rawText },
       'anonymous',
-    );
+    ) as { isSuccess: boolean; error: { code: string }; data: { id: string } };
+
     if (!entryResult.isSuccess) {
       return reply.status(500).send(
         failResponse([{ code: 'DB_ERROR', message: 'Failed to save entry' }], traceId),
@@ -54,10 +56,9 @@ export const moodRoutes: FastifyPluginAsync = async (app) => {
     const { id: entryId } = entryResult.data;
 
     if (clusters.length > 0) {
-      await executor.addRangeAsync(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        prisma.moodCluster as any,
-        clusters.map(phrase => ({ entryId, phrase })),
+      await exec.addRangeAsync(
+        prisma.moodCluster,
+        clusters.map((phrase: string) => ({ entryId, phrase })),
         'anonymous',
       );
     }
