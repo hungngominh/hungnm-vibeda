@@ -8,7 +8,7 @@ import { useCloudSocket } from '../hooks/useCloudSocket';
 import type { MascotKey } from '../components/ModelViewer';
 import type { WordItem } from '../components/WordCloud';
 
-const W = 80, H = 100; // bubble size
+const W = 90, H = 110; // bubble size
 
 function loadPos() {
   try {
@@ -60,11 +60,8 @@ export function WidgetPage() {
 
   function onBubblePointerMove(e: React.PointerEvent) {
     if (!drag.current) return;
-    const dx = e.clientX - drag.current.startPX;
-    const dy = e.clientY - drag.current.startPY;
-    if (Math.sqrt(dx * dx + dy * dy) < 8) return; // chỉ di chuyển khi kéo thật sự
-    const x = Math.max(0, Math.min(drag.current.startX + dx, window.innerWidth - W));
-    const y = Math.max(0, Math.min(drag.current.startY + dy, window.innerHeight - H));
+    const x = Math.max(0, Math.min(drag.current.startX + e.clientX - drag.current.startPX, window.innerWidth - W));
+    const y = Math.max(0, Math.min(drag.current.startY + e.clientY - drag.current.startPY, window.innerHeight - H));
     setPos({ x, y });
   }
 
@@ -176,15 +173,15 @@ export function WidgetPage() {
               if (Math.sqrt(dx * dx + dy * dy) < 5) setIsOpen(o => !o);
             }}
           >
-            <ModelViewer mascot={mascot} cameraControls fieldOfView="105deg" />
+            <ModelViewer mascot={mascot} cameraControls fieldOfView="90deg" />
           </div>
 
-          {/* Drag handle — kéo để di chuyển, đặt dưới model */}
+          {/* Drag handle — kéo để di chuyển */}
           <div
             style={{
-              position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-              width: 32, height: 16,
-              background: 'rgba(0,0,0,0.15)', borderRadius: 8,
+              position: 'absolute', top: 2, left: '50%', transform: 'translateX(-50%)',
+              width: 28, height: 14,
+              background: 'rgba(0,0,0,0.18)', borderRadius: 8,
               cursor: drag.current ? 'grabbing' : 'grab',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               gap: 3,
