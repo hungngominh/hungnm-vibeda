@@ -65,6 +65,26 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
   }, [selected]);
 
   useEffect(() => {
+    setSelected(prev => {
+      if (!prev) return prev;
+      const current = words.find(w => w.phrase === prev.phrase);
+      if (!current) return null; // cụm đã biến mất → đóng
+      if (current.count === prev.count) return prev; // không đổi → giữ reference cũ
+      return { ...prev, count: current.count }; // cập nhật count mới
+    });
+  }, [words]);
+
+  useEffect(() => {
+    setSelected(prev => {
+      if (!prev) return prev;
+      const current = layoutWords.find(lw => lw.text === prev.phrase);
+      if (!current) return null;
+      if (current.x === prev.x && current.y === prev.y && current.size === prev.size) return prev;
+      return { ...prev, x: current.x, y: current.y, size: current.size };
+    });
+  }, [layoutWords]);
+
+  useEffect(() => {
     if (!words.length) {
       setLayoutWords([]);
       return;
