@@ -16,6 +16,14 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 export async function buildServer() {
   const app = Fastify({ logger: true });
 
+  // Allow embedding as iframe from any origin
+  app.addHook('onSend', (_req, reply, _payload, done) => {
+    reply.header('X-Frame-Options', 'ALLOWALL');
+    reply.header('Content-Security-Policy', "frame-ancestors *");
+    reply.header('Access-Control-Allow-Origin', '*');
+    done();
+  });
+
   // WebSocket support — must register before routes that use it
   await app.register(fastifyWebSocket);
 

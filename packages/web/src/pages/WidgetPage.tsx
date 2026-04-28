@@ -10,9 +10,15 @@ import type { WordItem } from '../components/WordCloud';
 
 const W = 90, H = 110; // bubble size
 
+// localStorage may be blocked in cross-origin iframes (Chrome 115+ third-party storage partitioning)
+const store = {
+  get: (key: string) => { try { return localStorage.getItem(key); } catch { return null; } },
+  set: (key: string, val: string) => { try { localStorage.setItem(key, val); } catch {} },
+};
+
 function loadPos() {
   try {
-    const s = localStorage.getItem('moodaily-widget-pos');
+    const s = store.get('moodaily-widget-pos');
     if (s) return JSON.parse(s) as { x: number; y: number };
   } catch {}
   return { x: window.innerWidth - W - 16, y: window.innerHeight - H - 10 };
@@ -25,7 +31,7 @@ export function WidgetPage() {
   const [initialWords, setInitialWords] = useState<WordItem[]>([]);
   const [pos, setPos]                   = useState<{ x: number; y: number }>(loadPos);
   const [mascot, setMascot]             = useState<MascotKey>(
-    () => (localStorage.getItem('moodaily-mascot') as MascotKey | null) ?? 'chick',
+    () => (store.get('moodaily-mascot') as MascotKey | null) ?? 'chick',
   );
   const drag = useRef<{ startPX: number; startPY: number; startX: number; startY: number } | null>(null);
 
@@ -43,7 +49,7 @@ export function WidgetPage() {
 
   function applyMascot(key: MascotKey) {
     setMascot(key);
-    localStorage.setItem('moodaily-mascot', key);
+    store.set('moodaily-mascot', key);
     document.documentElement.dataset.theme = key;
   }
 
@@ -72,7 +78,7 @@ export function WidgetPage() {
     if (Math.sqrt(dx * dx + dy * dy) < 5) {
       setIsOpen(o => !o);
     } else {
-      localStorage.setItem('moodaily-widget-pos', JSON.stringify(pos));
+      store.set('moodaily-widget-pos', JSON.stringify(pos));
     }
     drag.current = null;
   }
