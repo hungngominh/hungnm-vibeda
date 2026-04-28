@@ -42,7 +42,7 @@ class GeminiProvider implements AiProvider {
 
   constructor(apiKey: string) {
     const genAI = new GoogleGenerativeAI(apiKey);
-    this.genModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    this.genModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
   }
 
   async extractClusters(text: string): Promise<string[]> {
