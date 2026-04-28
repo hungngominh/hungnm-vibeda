@@ -1,4 +1,5 @@
 import { createBaseController } from '@vegabase/api';
+import { z } from 'zod';
 import { MoodEntryService } from '../../service/mood-entry/mood-entry-service.js';
 import {
   moodEntryListSchema,
@@ -10,13 +11,15 @@ import { permissionCache } from '../../infrastructure/permission-cache.js';
 
 const moodEntryService = new MoodEntryService(prisma, executor, permissionCache);
 
+const noOpSchema = z.object({}) as unknown as z.ZodType<any>;
+
 export const entriesController = createBaseController({
   service: moodEntryService,
   prefix: '/api/admin/entries',
   schemas: {
     list: moodEntryListSchema,
-    add: moodEntryListSchema,
-    update: moodEntryListSchema,
+    add: noOpSchema,
+    update: noOpSchema,
     delete: moodEntryDeleteSchema,
   },
 });

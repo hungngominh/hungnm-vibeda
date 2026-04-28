@@ -4,7 +4,9 @@ import { successResponse } from '@vegabase/core';
 import { prisma } from '../../infrastructure/prisma.js';
 import { wsHub } from '../plugins/ws-hub.js';
 
-const cloudQuerySchema = z.object({ date: z.string().optional() });
+const cloudQuerySchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+});
 
 async function getWordsForDate(dateStr?: string) {
   const base = dateStr ? new Date(dateStr) : new Date();
