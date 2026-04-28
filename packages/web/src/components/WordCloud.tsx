@@ -127,11 +127,12 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
 
     // Horizontal: clamp trong [8, containerW - 8 - w]
     const idealLeft = selected.x - w / 2;
-    const clampedLeft = Math.max(8, Math.min(containerW - 8 - w, idealLeft));
+    const maxLeft = Math.max(8, containerW - 8 - w);
+    const clampedLeft = Math.max(8, Math.min(maxLeft, idealLeft));
     const left = clampedLeft + w / 2; // back to center coords (sẽ apply translate(-50%, ...))
     const arrowOffsetPx = selected.x - clampedLeft; // arrow distance từ left edge của tooltip
 
-    return { top, left, transformY, flipDown, arrowOffsetPx, w };
+    return { top, left, transformY, flipDown, arrowOffsetPx };
   })();
 
   return (
