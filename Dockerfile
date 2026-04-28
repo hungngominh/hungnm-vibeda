@@ -2,9 +2,9 @@ FROM node:20-slim
 
 ARG VEGABASE_REPO=https://github.com/hungngominh/vegabase-node.git
 
-# Build tools needed for native modules (argon2) and git clone
+# Build tools needed for native modules (argon2), git clone, and SSL verification
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git openssl python3 make g++ \
+    git openssl python3 make g++ ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g pnpm@9.0.0
