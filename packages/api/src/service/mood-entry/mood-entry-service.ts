@@ -27,13 +27,13 @@ export class MoodEntryService extends BaseService<MoodEntry, MoodEntryParam> {
     const base = super.applyFilter(where, p);
     const cond: Record<string, unknown> = { ...base };
     if (p.date) {
-      const d = new Date(p.date);
-      const start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const [y, mo, d] = p.date.split('-').map(Number);
+      const start = new Date(Date.UTC(y, mo - 1, d));
       const end = new Date(start.getTime() + 86_400_000);
       cond.logCreatedDate = { gte: start, lt: end };
     } else if (p.dateFrom) {
-      const d = new Date(p.dateFrom);
-      const start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const [y, mo, d] = p.dateFrom.split('-').map(Number);
+      const start = new Date(Date.UTC(y, mo - 1, d));
       cond.logCreatedDate = { gte: start };
     }
     if (p.keyword) {
@@ -54,7 +54,7 @@ export class MoodEntryService extends BaseService<MoodEntry, MoodEntryParam> {
         param.callerUsername,
       );
       if (!result.isSuccess) {
-        errors.add('DB_ERROR', `Failed to cascade-delete cluster ${id}`);
+        errors.add(result.error.code, `Failed to cascade-delete cluster ${id}`);
         return;
       }
     }

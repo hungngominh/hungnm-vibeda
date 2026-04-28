@@ -47,3 +47,30 @@ describe('MoodEntryService.getList', () => {
     if (result.ok) expect(result.data.total).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('MoodEntryService.getList negative tests', () => {
+  it('does not return entries from a different date', async () => {
+    // yesterday
+    const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+    await executor.addAsync(prisma.moodEntry, { rawText: 'negative date test' }, 'test');
+
+    const result = await service.getList({ date: yesterday, callerUsername: 'admin', callerRoles: ['admin'] });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      // entry created today should NOT appear in yesterday's results
+      const found = result.data.items?.some((e: any) => e.rawText === 'negative date test') ?? false;
+      expect(found).toBe(false);
+    }
+  });
+
+  it('returns entries using dateFrom range filter', async () => {
+    const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
+    await executor.addAsync(prisma.moodEntry, { rawText: 'dateFrom range test' }, 'test');
+
+    const result = await service.getList({ dateFrom: weekAgo, callerUsername: 'admin', callerRoles: ['admin'] });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.total).toBeGreaterThanOrEqual(1);
+  });
+});
