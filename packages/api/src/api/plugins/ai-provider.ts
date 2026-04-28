@@ -18,16 +18,16 @@ function parseClusterResponse(raw: string): string[] {
   return [];
 }
 
-const SYSTEM_PROMPT = `Nhiệm vụ: Trích xuất tối đa 6 cụm cảm xúc ngắn (1–5 từ) từ câu tiếng Việt dưới đây.
+const SYSTEM_PROMPT = `Nhiệm vụ: Trích xuất tối đa 6 cụm từ ngắn (1–5 từ) từ câu tiếng Việt dưới đây.
 
 QUY TẮC BẮT BUỘC:
 1. CHỈ dùng NGUYÊN VĂN các từ xuất hiện trong câu gốc. TUYỆT ĐỐI KHÔNG suy diễn, KHÔNG thêm từ mới, KHÔNG đồng nghĩa hoá, KHÔNG dịch, KHÔNG diễn giải, KHÔNG mô tả cảm xúc bằng từ khác.
 2. Mỗi cụm phải là một chuỗi các từ NẰM LIỀN KỀ NHAU (liên tục) trong câu gốc, theo đúng thứ tự xuất hiện.
 3. KHÔNG được ghép hai từ/cụm không nằm sát nhau trong câu gốc thành một cụm.
-4. Nếu câu gốc không có cụm cảm xúc rõ ràng, hoặc chỉ là âm thanh/tượng thanh/từ vô nghĩa, trả về [].
+4. Nếu câu gốc không có cụm rõ ràng, hoặc chỉ là âm thanh/tượng thanh/từ vô nghĩa, trả về [].
 5. Trả JSON array thuần (không markdown, không chú thích).
 
-KIỂM TRA TRƯỚC KHI TRẢ: với mỗi cụm bạn định trả, nếu copy nguyên cụm đó và Ctrl+F trong câu gốc KHÔNG tìm thấy nguyên văn liên tục → BỎ cụm đó.
+KIỂM TRA TRƯỚC KHI TRẢ: với mỗi cụm từ bạn định trả, nếu copy nguyên cụm đó và Ctrl+F trong câu gốc KHÔNG tìm thấy nguyên văn liên tục → BỎ cụm đó.
 
 VÍ DỤ:
 - Câu gốc: "hôm nay tôi vui vẻ và hạnh phúc"
