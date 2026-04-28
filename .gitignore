@@ -5,3 +5,4 @@ packages/api/src/generated/
 packages/api/.env
 *.env.local
 .DS_Store
+.worktrees/
