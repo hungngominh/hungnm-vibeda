@@ -1,0 +1,71 @@
+/* Default theme: Chick (amber) */
+:root {
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --surface: #fff8e8;
+  --primary: #b8690a;
+  --primary-container: #f5d9a8;
+  --on-primary-container: #5c3200;
+  --secondary: #c47e2a;
+  --secondary-container: #faecd4;
+  --text: #3a2800;
+  --text-secondary: #7a5c2e;
+  --border: #e8d5a8;
+  --shadow: 0 2px 12px rgba(184, 105, 10, 0.10);
+}
+
+[data-theme="axolotl"] {
+  --surface: #fff0f2;
+  --primary: #c0284a;
+  --primary-container: #f5b8c4;
+  --on-primary-container: #6b0020;
+  --secondary: #d4607a;
+  --secondary-container: #fad4dc;
+  --text: #3d0015;
+  --text-secondary: #8a3a50;
+  --border: #f0c0ca;
+  --shadow: 0 2px 12px rgba(192, 40, 74, 0.10);
+}
+
+[data-theme="mocha"] {
+  --surface: #fdf5ec;
+  --primary: #7a5230;
+  --primary-container: #e0c4a0;
+  --on-primary-container: #3d2210;
+  --secondary: #c4956a;
+  --secondary-container: #f5e0cc;
+  --text: #2e1800;
+  --text-secondary: #7a5230;
+  --border: #e0c4a0;
+  --shadow: 0 2px 12px rgba(122, 82, 48, 0.10);
+}
+
+[data-theme="whale"] {
+  --surface: #f0f6ff;
+  --primary: #1e6fa8;
+  --primary-container: #7ec4ef;
+  --on-primary-container: #0d3d62;
+  --secondary: #2e8b7a;
+  --secondary-container: #a8e6df;
+  --text: #0a2840;
+  --text-secondary: #2a5a7a;
+  --border: #b8d8f0;
+  --shadow: 0 2px 12px rgba(30, 111, 168, 0.10);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--surface);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+}
