@@ -176,7 +176,7 @@ export function WidgetPage() {
               if (Math.sqrt(dx * dx + dy * dy) < 5) setIsOpen(o => !o);
             }}
           >
-            <ModelViewer mascot={mascot} cameraControls fieldOfView="80deg" />
+            <ModelViewer mascot={mascot} cameraControls fieldOfView="105deg" />
           </div>
 
           {/* Drag handle — kéo để di chuyển, đặt dưới model */}
