@@ -6,7 +6,6 @@ export interface WordItem {
   count: number;
 }
 
-// Extend d3-cloud's Word with our custom color field
 interface D3Word {
   text?: string;
   size?: number;
@@ -26,13 +25,13 @@ interface LayoutWord {
 }
 
 const WORD_COLORS = ['var(--primary)', 'var(--secondary)', 'var(--tertiary)'];
-const CLOUD_HEIGHT = 280;
 
 interface WordCloudProps {
   words: WordItem[];
+  height?: number;
 }
 
-export function WordCloud({ words }: WordCloudProps) {
+export function WordCloud({ words, height = 320 }: WordCloudProps) {
   const [layoutWords, setLayoutWords] = useState<LayoutWord[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -45,12 +44,12 @@ export function WordCloud({ words }: WordCloudProps) {
     const maxCount = Math.max(...words.map(w => w.count));
     const minCount = Math.min(...words.map(w => w.count));
     const sizeScale = (count: number) =>
-      maxCount === minCount ? 28 : Math.round(16 + ((count - minCount) / (maxCount - minCount)) * 32);
+      maxCount === minCount ? 24 : Math.round(13 + ((count - minCount) / (maxCount - minCount)) * 24);
 
     const width = containerRef.current?.offsetWidth ?? 560;
 
     (cloud as any)()
-      .size([width, CLOUD_HEIGHT])
+      .size([width, height])
       .words(
         words.map((w, i) => ({
           text: w.phrase,
@@ -58,8 +57,8 @@ export function WordCloud({ words }: WordCloudProps) {
           color: WORD_COLORS[i % WORD_COLORS.length],
         }))
       )
-      .padding(6)
-      .rotate(() => (Math.random() > 0.7 ? 90 : 0))
+      .padding(10)
+      .rotate(() => (Math.random() > 0.8 ? 90 : 0))
       .font('Plus Jakarta Sans')
       .fontSize((d: D3Word) => d.size ?? 16)
       .on('end', (output: D3Word[]) => {
@@ -68,14 +67,14 @@ export function WordCloud({ words }: WordCloudProps) {
             text: d.text ?? '',
             size: d.size ?? 16,
             x: (d.x ?? 0) + width / 2,
-            y: (d.y ?? 0) + CLOUD_HEIGHT / 2,
+            y: (d.y ?? 0) + height / 2,
             rotate: d.rotate ?? 0,
             color: d.color,
           }))
         );
       })
       .start();
-  }, [words]);
+  }, [words, height]);
 
   return (
     <div
@@ -85,7 +84,7 @@ export function WordCloud({ words }: WordCloudProps) {
         borderRadius: 'var(--r-lg)',
         boxShadow: 'var(--shadow-soft)',
         padding: '36px 20px',
-        minHeight: CLOUD_HEIGHT + 72,
+        minHeight: height + 72,
         position: 'relative',
       }}
     >
@@ -98,7 +97,7 @@ export function WordCloud({ words }: WordCloudProps) {
           Chưa có cảm xúc nào được chia sẻ hôm nay
         </div>
       ) : (
-        <div style={{ position: 'relative', height: CLOUD_HEIGHT }}>
+        <div style={{ position: 'relative', height }}>
           {layoutWords.map(({ text, size, x, y, rotate, color }) => (
             <span
               key={text}
