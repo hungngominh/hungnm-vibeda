@@ -6,9 +6,14 @@ const base = z.object({
   JWT_ISSUER: z.string().optional(),
   JWT_AUDIENCE: z.string().optional(),
   PORT: z.coerce.number().default(3000),
-  AI_PROVIDER: z.enum(['openai', 'gemini']),
+  AI_PROVIDER: z.enum(['openai', 'gemini', 'vegaproxy', 'azure']).default('gemini'),
   OPENAI_API_KEY: z.string().default(''),
   GEMINI_API_KEY: z.string().default(''),
+  VEGAPROXY_API_KEY: z.string().default(''),
+  VEGAPROXY_ENDPOINT: z.string().default('https://claudinge.allianceitsc.com'),
+  AZURE_OPENAI_API_KEY: z.string().default(''),
+  AZURE_OPENAI_ENDPOINT: z.string().default(''),
+  AZURE_OPENAI_DEPLOYMENT: z.string().default(''),
 });
 
 const schema = base.superRefine((data, ctx) => {
@@ -17,6 +22,12 @@ const schema = base.superRefine((data, ctx) => {
   }
   if (data.AI_PROVIDER === 'gemini' && !data.GEMINI_API_KEY) {
     ctx.addIssue({ code: 'custom', path: ['GEMINI_API_KEY'], message: 'Required when AI_PROVIDER=gemini' });
+  }
+  if (data.AI_PROVIDER === 'vegaproxy' && !data.VEGAPROXY_API_KEY) {
+    ctx.addIssue({ code: 'custom', path: ['VEGAPROXY_API_KEY'], message: 'Required when AI_PROVIDER=vegaproxy' });
+  }
+  if (data.AI_PROVIDER === 'azure' && !data.AZURE_OPENAI_API_KEY) {
+    ctx.addIssue({ code: 'custom', path: ['AZURE_OPENAI_API_KEY'], message: 'Required when AI_PROVIDER=azure' });
   }
 });
 

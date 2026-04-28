@@ -18,8 +18,7 @@ function parseClusterResponse(raw: string): string[] {
   return [];
 }
 
-const PROMPT = (text: string) =>
-  `Nhiệm vụ: Trích xuất tối đa 6 cụm cảm xúc ngắn (1–5 từ) từ câu tiếng Việt dưới đây.
+const SYSTEM_PROMPT = `Nhiệm vụ: Trích xuất tối đa 6 cụm cảm xúc ngắn (1–5 từ) từ câu tiếng Việt dưới đây.
 
 QUY TẮC BẮT BUỘC:
 1. CHỈ dùng NGUYÊN VĂN các từ xuất hiện trong câu gốc. TUYỆT ĐỐI KHÔNG suy diễn, KHÔNG thêm từ mới, KHÔNG đồng nghĩa hoá, KHÔNG dịch, KHÔNG diễn giải, KHÔNG mô tả cảm xúc bằng từ khác.
@@ -41,9 +40,7 @@ VÍ DỤ:
 
 - Câu gốc: "mệt quá đi"
   Đúng: ["mệt quá"]
-  SAI: ["kiệt sức"] (đồng nghĩa), ["mệt mỏi"] (chữ "mỏi" không có trong câu gốc)
-
-Câu gốc: ${text}`;
+  SAI: ["kiệt sức"] (đồng nghĩa), ["mệt mỏi"] (chữ "mỏi" không có trong câu gốc)`;
 
 class OpenAiProvider implements AiProvider {
   private client: OpenAI;
@@ -55,7 +52,9 @@ class OpenAiProvider implements AiProvider {
   async extractClusters(text: string): Promise<string[]> {
     const res = await this.client.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: PROMPT(text) }],
+      messages: [
+        { role: 'user', content: `${SYSTEM_PROMPT}\n\nCâu gốc: ${text}` },
+      ],
     });
     return parseClusterResponse(res.choices[0]?.message?.content ?? '[]');
   }
@@ -66,16 +65,105 @@ class GeminiProvider implements AiProvider {
 
   constructor(apiKey: string) {
     const genAI = new GoogleGenerativeAI(apiKey);
-    this.genModel = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+    this.genModel = genAI.getGenerativeModel({
+      model: 'gemini-flash-latest',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0,
+        maxOutputTokens: 200,
+      },
+    });
   }
 
   async extractClusters(text: string): Promise<string[]> {
-    const result = await this.genModel.generateContent(PROMPT(text));
+    const result = await this.genModel.generateContent(
+      `${SYSTEM_PROMPT}\n\nCâu gốc: ${text}`
+    );
     return parseClusterResponse(result.response.text());
   }
 }
 
+class VegaProxyProvider implements AiProvider {
+  private apiKey: string;
+  private endpoint: string;
+
+  constructor(apiKey: string, endpoint: string = 'https://claudinge.allianceitsc.com') {
+    this.apiKey = apiKey;
+    this.endpoint = endpoint.replace(/\/$/, '');
+  }
+
+  async extractClusters(text: string): Promise<string[]> {
+    const response = await fetch(`${this.endpoint}/v1/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20241022',
+        max_tokens: 200,
+        system: SYSTEM_PROMPT,
+        messages: [
+          {
+            role: 'user',
+            content: `Câu gốc: ${text}`,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`VegaProxy error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = (await response.json()) as { content: Array<{ type: string; text: string }> };
+    const text_content = data.content.find((c) => c.type === 'text');
+    if (!text_content) return [];
+
+    return parseClusterResponse(text_content.text);
+  }
+}
+
+class AzureOpenAiProvider implements AiProvider {
+  private client: OpenAI;
+
+  constructor(apiKey: string, endpoint: string, deploymentName: string) {
+    this.client = new OpenAI({
+      apiKey,
+      baseURL: `${endpoint.replace(/\/$/, '')}/openai/deployments/${deploymentName}`,
+      defaultQuery: { 'api-version': '2024-02-15-preview' },
+      defaultHeaders: { 'api-key': apiKey },
+    });
+  }
+
+  async extractClusters(text: string): Promise<string[]> {
+    const res = await this.client.chat.completions.create({
+      model: 'deployment-name',
+      messages: [
+        { role: 'user', content: `${SYSTEM_PROMPT}\n\nCâu gốc: ${text}` },
+      ],
+    });
+    return parseClusterResponse(res.choices[0]?.message?.content ?? '[]');
+  }
+}
+
 export function createAiProvider(): AiProvider {
-  if (env.AI_PROVIDER === 'openai') return new OpenAiProvider(env.OPENAI_API_KEY);
-  return new GeminiProvider(env.GEMINI_API_KEY);
+  const provider = env.AI_PROVIDER?.toLowerCase() || 'gemini';
+
+  switch (provider) {
+    case 'openai':
+      return new OpenAiProvider(env.OPENAI_API_KEY);
+    case 'vegaproxy':
+      return new VegaProxyProvider(env.VEGAPROXY_API_KEY, env.VEGAPROXY_ENDPOINT);
+    case 'azure':
+      return new AzureOpenAiProvider(
+        env.AZURE_OPENAI_API_KEY,
+        env.AZURE_OPENAI_ENDPOINT,
+        env.AZURE_OPENAI_DEPLOYMENT
+      );
+    case 'gemini':
+    default:
+      return new GeminiProvider(env.GEMINI_API_KEY);
+  }
 }
