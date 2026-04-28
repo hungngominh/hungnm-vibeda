@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MoodInput } from '../components/MoodInput';
 import { WordCloud } from '../components/WordCloud';
+import { ModelViewer } from '../components/ModelViewer';
 import { MascotPicker } from './MascotPicker';
 import { api } from '../lib/api';
 import { useCloudSocket } from '../hooks/useCloudSocket';
@@ -84,12 +85,11 @@ export function WidgetPage() {
               display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <div style={{
-                width: 36, height: 36, borderRadius: '50%',
+                width: 40, height: 40, borderRadius: '50%',
                 background: 'var(--surface)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 20, flexShrink: 0,
+                overflow: 'hidden', flexShrink: 0,
               }}>
-                {MASCOT_EMOJI[mascot]}
+                <ModelViewer mascot={mascot} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--on-surface)' }}>
@@ -144,16 +144,15 @@ export function WidgetPage() {
           onClick={() => setIsOpen(o => !o)}
           style={{
             position: 'fixed', bottom: 20, right: 20,
-            width: 62, height: 62, borderRadius: '50%',
+            width: 72, height: 72, borderRadius: '50%',
             background: 'var(--primary)',
             border: 'none', cursor: 'pointer',
             boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
-            fontSize: 30,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 0, overflow: 'hidden',
             zIndex: 100,
           }}
         >
-          {MASCOT_EMOJI[mascot]}
+          <ModelViewer mascot={mascot} />
         </button>
 
         <style>{`
