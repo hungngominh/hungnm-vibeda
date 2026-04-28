@@ -144,11 +144,10 @@ export function WidgetPage() {
           onClick={() => setIsOpen(o => !o)}
           style={{
             position: 'fixed', bottom: 20, right: 20,
-            width: 72, height: 72, borderRadius: '50%',
-            background: 'var(--primary)',
+            width: 80, height: 80,
+            background: 'none',
             border: 'none', cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
-            padding: 0, overflow: 'hidden',
+            padding: 0,
             zIndex: 100,
           }}
         >
