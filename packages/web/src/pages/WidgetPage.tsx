@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MoodInput } from '../components/MoodInput';
 import { WordCloud } from '../components/WordCloud';
 import { ModelViewer } from '../components/ModelViewer';
@@ -8,21 +8,26 @@ import { useCloudSocket } from '../hooks/useCloudSocket';
 import type { MascotKey } from '../components/ModelViewer';
 import type { WordItem } from '../components/WordCloud';
 
-const MASCOT_EMOJI: Record<MascotKey, string> = {
-  chick:   '🐥',
-  axolotl: '🦎',
-  mocha:   '🐱',
-  whale:   '🐋',
-};
+const W = 90, H = 110; // bubble size
+
+function loadPos() {
+  try {
+    const s = localStorage.getItem('moodaily-widget-pos');
+    if (s) return JSON.parse(s) as { x: number; y: number };
+  } catch {}
+  return { x: window.innerWidth - W - 16, y: window.innerHeight - H - 10 };
+}
 
 export function WidgetPage() {
   const [isOpen, setIsOpen]             = useState(false);
   const [showPicker, setShowPicker]     = useState(false);
   const [submitted, setSubmitted]       = useState(false);
   const [initialWords, setInitialWords] = useState<WordItem[]>([]);
+  const [pos, setPos]                   = useState<{ x: number; y: number }>(loadPos);
   const [mascot, setMascot]             = useState<MascotKey>(
     () => (localStorage.getItem('moodaily-mascot') as MascotKey | null) ?? 'chick',
   );
+  const drag = useRef<{ startPX: number; startPY: number; startX: number; startY: number } | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
   const words = useCloudSocket(initialWords, true);
@@ -48,27 +53,53 @@ export function WidgetPage() {
     setTimeout(() => setSubmitted(false), 2000);
   }
 
+  function onBubblePointerDown(e: React.PointerEvent) {
+    drag.current = { startPX: e.clientX, startPY: e.clientY, startX: pos.x, startY: pos.y };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onBubblePointerMove(e: React.PointerEvent) {
+    if (!drag.current) return;
+    const x = Math.max(0, Math.min(drag.current.startX + e.clientX - drag.current.startPX, window.innerWidth - W));
+    const y = Math.max(0, Math.min(drag.current.startY + e.clientY - drag.current.startPY, window.innerHeight - H));
+    setPos({ x, y });
+  }
+
+  function onBubblePointerUp(e: React.PointerEvent) {
+    if (!drag.current) return;
+    const dx = e.clientX - drag.current.startPX;
+    const dy = e.clientY - drag.current.startPY;
+    if (Math.sqrt(dx * dx + dy * dy) < 5) {
+      setIsOpen(o => !o);
+    } else {
+      localStorage.setItem('moodaily-widget-pos', JSON.stringify(pos));
+    }
+    drag.current = null;
+  }
+
+  // Popup: appear above/beside bubble, clamped to viewport
+  const popupW = 240;
+  const popupLeft = Math.max(8, Math.min(pos.x - (popupW - W) / 2, window.innerWidth - popupW - 8));
+  const popupBottom = window.innerHeight - pos.y + 8;
+
   return (
     <>
-      {/* Make html/body click-transparent so iframe doesn't block parent page */}
       <style>{`html,body{pointer-events:none;background:transparent;}`}</style>
 
-      {/* Widget root — re-enables pointer events */}
       <div style={{ pointerEvents: 'auto' }}>
 
         {/* Click-outside overlay */}
         {isOpen && (
-          <div
-            onClick={() => setIsOpen(false)}
-            style={{ position: 'fixed', inset: 0, zIndex: 98 }}
-          />
+          <div onClick={() => setIsOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 98 }} />
         )}
 
         {/* Popup card */}
         {isOpen && (
           <div style={{
-            position: 'fixed', bottom: 92, right: 14,
-            width: 240,
+            position: 'fixed',
+            bottom: popupBottom,
+            left: popupLeft,
+            width: popupW,
             maxHeight: 'calc(100vh - 120px)',
             display: 'flex', flexDirection: 'column',
             background: 'var(--surface)',
@@ -127,29 +158,22 @@ export function WidgetPage() {
                 <WordCloud words={words} height={160} />
               </div>
             </div>
-
-            {/* Arrow pointing down to bubble */}
-            <div style={{
-              position: 'absolute', bottom: -6, right: 26,
-              width: 12, height: 12,
-              background: 'var(--surface)',
-              transform: 'rotate(45deg)',
-              boxShadow: '2px 2px 4px rgba(0,0,0,0.06)',
-            }} />
           </div>
         )}
 
-        {/* Mascot bubble — drag xoay, tap ngắn mở popup */}
+        {/* Mascot bubble — drag để di chuyển, tap để mở popup */}
         <div
-          style={{ position: 'fixed', bottom: 10, right: 16, width: 90, height: 110, zIndex: 100 }}
-          onPointerDown={(e) => { (e.currentTarget as any)._startX = e.clientX; (e.currentTarget as any)._startY = e.clientY; }}
-          onPointerUp={(e) => {
-            const dx = e.clientX - (e.currentTarget as any)._startX;
-            const dy = e.clientY - (e.currentTarget as any)._startY;
-            if (Math.sqrt(dx * dx + dy * dy) < 5) setIsOpen(o => !o);
+          style={{
+            position: 'fixed', left: pos.x, top: pos.y,
+            width: W, height: H,
+            cursor: drag.current ? 'grabbing' : 'grab',
+            zIndex: 100,
           }}
+          onPointerDown={onBubblePointerDown}
+          onPointerMove={onBubblePointerMove}
+          onPointerUp={onBubblePointerUp}
         >
-          <ModelViewer mascot={mascot} cameraControls />
+          <ModelViewer mascot={mascot} />
         </div>
 
         <style>{`
