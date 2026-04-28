@@ -83,9 +83,10 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
         background: 'var(--container-lowest)',
         borderRadius: 'var(--r-lg)',
         boxShadow: 'var(--shadow-soft)',
-        padding: '36px 20px',
-        minHeight: height + 72,
+        padding: height < 200 ? '16px 12px' : '36px 20px',
+        minHeight: height + (height < 200 ? 32 : 72),
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
       {words.length === 0 ? (

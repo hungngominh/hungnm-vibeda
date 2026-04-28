@@ -68,6 +68,8 @@ export function WidgetPage() {
           <div style={{
             position: 'fixed', bottom: 92, right: 14,
             width: 240,
+            maxHeight: 'calc(100vh - 120px)',
+            display: 'flex', flexDirection: 'column',
             background: 'var(--surface)',
             borderRadius: 18,
             boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
@@ -110,7 +112,7 @@ export function WidgetPage() {
             </div>
 
             {/* Body */}
-            <div style={{ padding: '10px 12px' }}>
+            <div style={{ padding: '10px 12px', overflowY: 'auto', flex: 1 }}>
               {submitted ? (
                 <div style={{
                   textAlign: 'center', padding: '8px 0',
