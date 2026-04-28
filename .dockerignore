@@ -1,0 +1,11 @@
+node_modules
+packages/*/node_modules
+packages/api/dist
+packages/api/public
+.git
+.gitignore
+*.md
+.env
+*.env.local
+.DS_Store
+.worktrees

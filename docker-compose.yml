@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  app:
+    image: hungnm-vibeda:latest
+    container_name: hungnm-vibeda
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VEGABASE_REPO: https://github.com/hungngominh/vegabase-node.git
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:3000/api/cloud',r=>{process.exit(r.statusCode<500?0:1)}).on('error',()=>process.exit(1))"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
