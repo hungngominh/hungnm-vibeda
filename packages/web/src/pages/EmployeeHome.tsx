@@ -21,8 +21,8 @@ export function EmployeeHome() {
   const [initialWords, setInitialWords] = useState<{ phrase: string; count: number }[]>([]);
   const [loadingWords, setLoadingWords] = useState(true);
 
-  const words = useCloudSocket(initialWords);
   const today = toDateStr(new Date());
+  const words = useCloudSocket(initialWords, date === today);
 
   function applyMascot(key: MascotKey) {
     setMascot(key);

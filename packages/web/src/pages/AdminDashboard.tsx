@@ -33,6 +33,7 @@ export function AdminDashboard() {
   const [keyword, setKeyword] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [stats, setStats] = useState({ today: 0, week: 0, month: 0 });
+  const [error, setError] = useState<string | null>(null);
 
   function logout() {
     localStorage.removeItem('moodaily-token');
@@ -40,14 +41,19 @@ export function AdminDashboard() {
   }
 
   const loadEntries = useCallback(async () => {
-    const params: Parameters<typeof api.getEntries>[0] = { page, pageSize: PAGE_SIZE };
-    if (dateFilter === 'today') params.date = new Date().toISOString().slice(0, 10);
-    if (dateFilter === 'week')  params.dateFrom = subtractDays(7);
-    if (dateFilter === 'month') params.dateFrom = subtractDays(30);
-    if (keyword) params.keyword = keyword;
-    const res = await api.getEntries(params);
-    setEntries(res.items as EntryRow[]);
-    setTotal(res.total);
+    setError(null);
+    try {
+      const params: Parameters<typeof api.getEntries>[0] = { page, pageSize: PAGE_SIZE };
+      if (dateFilter === 'today') params.date = new Date().toISOString().slice(0, 10);
+      if (dateFilter === 'week')  params.dateFrom = subtractDays(7);
+      if (dateFilter === 'month') params.dateFrom = subtractDays(30);
+      if (keyword) params.keyword = keyword;
+      const res = await api.getEntries(params);
+      setEntries(res.items as EntryRow[]);
+      setTotal(res.total);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load entries');
+    }
   }, [page, dateFilter, keyword]);
 
   useEffect(() => {
@@ -67,9 +73,14 @@ export function AdminDashboard() {
 
   async function confirmDelete() {
     if (!deleteTarget) return;
-    await api.deleteEntry(deleteTarget);
-    setDeleteTarget(null);
-    loadEntries();
+    try {
+      await api.deleteEntry(deleteTarget);
+      setDeleteTarget(null);
+      loadEntries();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to delete entry');
+      setDeleteTarget(null);
+    }
   }
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -115,6 +126,15 @@ export function AdminDashboard() {
             }}
           />
         </div>
+
+        {error && (
+          <div style={{
+            background: '#fff3f3', border: '1px solid #e53935', borderRadius: 8,
+            padding: '12px 16px', color: '#c62828', fontSize: 14, marginBottom: 16,
+          }}>
+            {error}
+          </div>
+        )}
 
         <div style={{
           background: '#fff', borderRadius: 'var(--radius)',
