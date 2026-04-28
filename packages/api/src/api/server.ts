@@ -21,15 +21,19 @@ export async function buildServer() {
   // 1. Error handler (global)
   await app.register(errorHandlerPlugin);
 
-  // 2. Public routes — registered BEFORE vegabaseJwtPlugin (LA-09)
+  // 2. Public routes — registered BEFORE the JWT-protected scope (LA-09)
   await app.register(moodRoutes);
   await app.register(cloudRoutes);
   await app.register(adminRoutes);
 
-  // 3–5. JWT-protected scope — encapsulated child context (LA-09)
-  // vegabaseJwtPlugin uses fastify-plugin (fp), which would escape encapsulation
-  // if registered at root. Wrapping in a plain async plugin keeps the onRequest
-  // hook scoped to this child and away from public routes above.
+  // 3–5. JWT-protected scope — plain async plugin (no fp) isolates the
+  //      vegabaseJwtPlugin onRequest hook to this child scope only.
+  //      vegabaseJwtPlugin and callerInfoPlugin both use fp internally but
+  //      that only escapes ONE level: from their inner scope up to this child
+  //      scope (protected_). Hooks do NOT propagate up to app (the parent).
+  //      NOTE: @fastify/jwt decorators (app.jwt / req.jwtVerify) are also
+  //      scoped to protected_ — if public routes need to sign tokens they
+  //      must use the jwtSign utility directly (see adminRoutes).
   await app.register(async (protected_) => {
     await protected_.register(vegabaseJwtPlugin, {
       secret: env.JWT_SECRET,
@@ -37,9 +41,10 @@ export async function buildServer() {
       audience: env.JWT_AUDIENCE,
     });
 
+    // 4. Caller info — extracts sub + roles from JWT payload
     await protected_.register(callerInfoPlugin);
 
-    // Protected routes
+    // 5. Protected routes
     await protected_.register(entriesController);
   });
 
