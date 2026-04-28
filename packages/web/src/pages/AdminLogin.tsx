@@ -27,9 +27,9 @@ export function AdminLogin() {
   }
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)',
-    border: '1.5px solid var(--border)', fontFamily: 'var(--font)',
-    fontSize: 15, outline: 'none', background: 'var(--surface)', color: 'var(--text)',
+    width: '100%', padding: '10px 14px', borderRadius: 'var(--r-sm)',
+    border: '1.5px solid var(--outline-variant)', fontFamily: 'var(--font)',
+    fontSize: 15, outline: 'none', background: 'var(--surface)', color: 'var(--on-surface)',
   };
 
   return (

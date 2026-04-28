@@ -15,7 +15,7 @@ export function ConfirmDialog({ open, message, onConfirm, onCancel }: ConfirmDia
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
     }}>
       <div style={{
-        background: 'var(--surface)', borderRadius: 'var(--radius)',
+        background: 'var(--surface)', borderRadius: 'var(--r-lg)',
         padding: 32, maxWidth: 400, width: '90%',
         boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
       }}>

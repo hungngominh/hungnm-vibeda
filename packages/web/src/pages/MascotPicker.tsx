@@ -24,10 +24,10 @@ export function MascotPicker({ current, onSelect, onClose }: MascotPickerProps) 
         background: 'var(--surface)', borderRadius: 24, padding: 32,
         maxWidth: 580, width: '100%', boxShadow: '0 12px 48px rgba(0,0,0,0.25)',
       }}>
-        <h2 style={{ textAlign: 'center', marginBottom: 8, color: 'var(--text)' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: 8, color: 'var(--on-surface)' }}>
           Chọn linh vật
         </h2>
-        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: 28, fontSize: 14 }}>
+        <p style={{ textAlign: 'center', color: 'var(--on-surface-variant)', marginBottom: 28, fontSize: 14 }}>
           Theme màu sắc sẽ thay đổi theo linh vật bạn chọn
         </p>
 
@@ -38,7 +38,7 @@ export function MascotPicker({ current, onSelect, onClose }: MascotPickerProps) 
               onClick={() => { onSelect(m.key); onClose?.(); }}
               style={{
                 background: current === m.key ? m.primary + '1a' : '#fff',
-                border: `${current === m.key ? 2.5 : 1.5}px solid ${current === m.key ? m.primary : 'var(--border)'}`,
+                border: `${current === m.key ? 2.5 : 1.5}px solid ${current === m.key ? m.primary : 'var(--outline-variant)'}`,
                 borderRadius: 16, padding: '16px 12px', cursor: 'pointer',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
                 transition: 'all 0.2s',
@@ -47,7 +47,7 @@ export function MascotPicker({ current, onSelect, onClose }: MascotPickerProps) 
               <div style={{ width: 100, height: 120 }}>
                 <ModelViewer mascot={m.key} />
               </div>
-              <span style={{ fontWeight: 600, color: 'var(--text)', fontFamily: 'var(--font)', fontSize: 14 }}>
+              <span style={{ fontWeight: 600, color: 'var(--on-surface)', fontFamily: 'var(--font)', fontSize: 14 }}>
                 {m.label}
               </span>
             </button>
@@ -59,7 +59,7 @@ export function MascotPicker({ current, onSelect, onClose }: MascotPickerProps) 
             onClick={onClose}
             style={{
               display: 'block', margin: '24px auto 0', background: 'none',
-              border: 'none', color: 'var(--text-secondary)', cursor: 'pointer',
+              border: 'none', color: 'var(--on-surface-variant)', cursor: 'pointer',
               fontFamily: 'var(--font)', fontSize: 14,
             }}
           >
