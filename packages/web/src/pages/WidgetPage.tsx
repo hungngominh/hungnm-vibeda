@@ -119,7 +119,7 @@ export function WidgetPage() {
                   Đã gửi ✓
                 </div>
               ) : (
-                <MoodInput onSubmit={handleSubmit} />
+                <MoodInput onSubmit={handleSubmit} compact />
               )}
               <div style={{ marginTop: 8 }}>
                 <WordCloud words={words} height={160} />
