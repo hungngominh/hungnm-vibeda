@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { WordItem } from '../components/WordCloud';
 
 export function useCloudSocket(initialWords: WordItem[], isLive: boolean) {
   const [words, setWords] = useState<WordItem[]>(initialWords);
+  const isLiveRef = useRef(isLive);
+  useEffect(() => { isLiveRef.current = isLive; }, [isLive]);
 
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const ws = new WebSocket(`${protocol}//${window.location.host}/api/cloud/ws`);
 
     ws.onmessage = (event) => {
-      if (!isLive) return;
+      if (!isLiveRef.current) return;
       try {
         const msg: unknown = JSON.parse(event.data as string);
         if (
