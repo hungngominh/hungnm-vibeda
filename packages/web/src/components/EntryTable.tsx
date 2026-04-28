@@ -16,7 +16,7 @@ interface EntryTableProps {
 export function EntryTable({ entries, onDelete }: EntryTableProps) {
   if (entries.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-secondary)', fontSize: 14 }}>
+      <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--on-surface-variant)', fontSize: 14 }}>
         Không có entries
       </div>
     );
@@ -24,7 +24,7 @@ export function EntryTable({ entries, onDelete }: EntryTableProps) {
 
   const thStyle: React.CSSProperties = {
     padding: '10px 12px', textAlign: 'left',
-    color: 'var(--text-secondary)', fontWeight: 600, fontSize: 13,
+    color: 'var(--on-surface-variant)', fontWeight: 600, fontSize: 13,
   };
   const tdStyle: React.CSSProperties = { padding: '10px 12px', fontSize: 14 };
 
@@ -32,7 +32,7 @@ export function EntryTable({ entries, onDelete }: EntryTableProps) {
     <div style={{ overflowX: 'auto' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
-          <tr style={{ borderBottom: '2px solid var(--border)' }}>
+          <tr style={{ borderBottom: `2px solid var(--outline-variant)` }}>
             <th style={thStyle}>Thời gian</th>
             <th style={thStyle}>Nội dung</th>
             <th style={{ ...thStyle, textAlign: 'center' }}>Cụm</th>
@@ -41,22 +41,18 @@ export function EntryTable({ entries, onDelete }: EntryTableProps) {
         </thead>
         <tbody>
           {entries.map(entry => (
-            <tr key={entry.id} style={{ borderBottom: '1px solid var(--border)' }}>
-              <td style={{ ...tdStyle, whiteSpace: 'nowrap', color: 'var(--text-secondary)' }}>
+            <tr key={entry.id} style={{ borderBottom: `1px solid var(--outline-variant)` }}>
+              <td style={{ ...tdStyle, whiteSpace: 'nowrap', color: 'var(--on-surface-variant)' }}>
                 {new Date(entry.logCreatedDate).toLocaleString('vi-VN')}
               </td>
               <td style={{ ...tdStyle, maxWidth: 400 }}>
                 {entry.rawText.length > 80 ? entry.rawText.slice(0, 80) + '…' : entry.rawText}
               </td>
               <td style={{ ...tdStyle, textAlign: 'center' }}>
-                <Chip label={String(entry._clusterCount ?? 0)} />
+                <Chip label={String(entry._clusterCount ?? 0)} variant="mint" style={{ fontSize: 10, padding: '4px 10px' }} />
               </td>
               <td style={{ ...tdStyle, textAlign: 'center' }}>
-                <Button
-                  variant="ghost" size="sm"
-                  onClick={() => onDelete(entry.id)}
-                  style={{ color: '#e53935' }}
-                >
+                <Button variant="secondary" size="sm" onClick={() => onDelete(entry.id)}>
                   Xóa
                 </Button>
               </td>
