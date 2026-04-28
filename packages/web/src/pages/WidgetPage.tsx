@@ -60,8 +60,11 @@ export function WidgetPage() {
 
   function onBubblePointerMove(e: React.PointerEvent) {
     if (!drag.current) return;
-    const x = Math.max(0, Math.min(drag.current.startX + e.clientX - drag.current.startPX, window.innerWidth - W));
-    const y = Math.max(0, Math.min(drag.current.startY + e.clientY - drag.current.startPY, window.innerHeight - H));
+    const dx = e.clientX - drag.current.startPX;
+    const dy = e.clientY - drag.current.startPY;
+    if (Math.sqrt(dx * dx + dy * dy) < 8) return; // chỉ di chuyển khi kéo thật sự
+    const x = Math.max(0, Math.min(drag.current.startX + dx, window.innerWidth - W));
+    const y = Math.max(0, Math.min(drag.current.startY + dy, window.innerHeight - H));
     setPos({ x, y });
   }
 
@@ -176,12 +179,12 @@ export function WidgetPage() {
             <ModelViewer mascot={mascot} cameraControls />
           </div>
 
-          {/* Drag handle — kéo để di chuyển */}
+          {/* Drag handle — kéo để di chuyển, đặt dưới model */}
           <div
             style={{
-              position: 'absolute', top: 2, left: '50%', transform: 'translateX(-50%)',
-              width: 28, height: 14,
-              background: 'rgba(0,0,0,0.18)', borderRadius: 8,
+              position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+              width: 32, height: 16,
+              background: 'rgba(0,0,0,0.15)', borderRadius: 8,
               cursor: drag.current ? 'grabbing' : 'grab',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               gap: 3,
