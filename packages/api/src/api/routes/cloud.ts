@@ -20,7 +20,6 @@ async function getWordsForDate(dateStr?: string) {
     },
     _count: { id: true },
     orderBy: { _count: { id: 'desc' } },
-    take: 50,
   });
   return rows.map(r => ({ phrase: r.phrase, count: r._count.id }));
 }
