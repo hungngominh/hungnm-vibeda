@@ -19,7 +19,16 @@ function parseClusterResponse(raw: string): string[] {
 }
 
 const PROMPT = (text: string) =>
-  `Trích xuất tối đa 6 cụm cảm xúc ngắn (2–5 từ) từ câu tiếng Việt sau, trả JSON array thuần (không markdown): ${text}`;
+  `Nhiệm vụ: Trích xuất tối đa 6 cụm cảm xúc ngắn (1–5 từ) từ câu tiếng Việt dưới đây.
+
+QUY TẮC BẮT BUỘC:
+1. CHỈ dùng nguyên văn các từ xuất hiện trong câu gốc. KHÔNG được suy diễn, KHÔNG thêm từ mới, KHÔNG đồng nghĩa hoá, KHÔNG dịch, KHÔNG diễn giải.
+2. Mỗi cụm phải là một chuỗi các từ NẰM LIỀN KỀ NHAU (liên tục) trong câu gốc, theo đúng thứ tự xuất hiện.
+3. KHÔNG được ghép hai từ/cụm không nằm sát nhau trong câu gốc thành một cụm.
+4. Nếu câu gốc không có cụm cảm xúc rõ ràng, trả về [].
+5. Trả JSON array thuần (không markdown, không chú thích).
+
+Câu gốc: ${text}`;
 
 class OpenAiProvider implements AiProvider {
   private client: OpenAI;
