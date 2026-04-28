@@ -161,19 +161,37 @@ export function WidgetPage() {
           </div>
         )}
 
-        {/* Mascot bubble — drag để di chuyển, tap để mở popup */}
-        <div
-          style={{
-            position: 'fixed', left: pos.x, top: pos.y,
-            width: W, height: H,
-            cursor: drag.current ? 'grabbing' : 'grab',
-            zIndex: 100,
-          }}
-          onPointerDown={onBubblePointerDown}
-          onPointerMove={onBubblePointerMove}
-          onPointerUp={onBubblePointerUp}
-        >
-          <ModelViewer mascot={mascot} />
+        {/* Mascot bubble */}
+        <div style={{ position: 'fixed', left: pos.x, top: pos.y, width: W, height: H, zIndex: 100 }}>
+          {/* Model — xoay bằng cameraControls, tap mở popup */}
+          <div
+            style={{ width: '100%', height: '100%' }}
+            onPointerDown={(e) => { (e.currentTarget as any)._sx = e.clientX; (e.currentTarget as any)._sy = e.clientY; }}
+            onPointerUp={(e) => {
+              const dx = e.clientX - (e.currentTarget as any)._sx;
+              const dy = e.clientY - (e.currentTarget as any)._sy;
+              if (Math.sqrt(dx * dx + dy * dy) < 5) setIsOpen(o => !o);
+            }}
+          >
+            <ModelViewer mascot={mascot} cameraControls />
+          </div>
+
+          {/* Drag handle — kéo để di chuyển */}
+          <div
+            style={{
+              position: 'absolute', top: 2, left: '50%', transform: 'translateX(-50%)',
+              width: 28, height: 14,
+              background: 'rgba(0,0,0,0.18)', borderRadius: 8,
+              cursor: drag.current ? 'grabbing' : 'grab',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: 3,
+            }}
+            onPointerDown={onBubblePointerDown}
+            onPointerMove={onBubblePointerMove}
+            onPointerUp={(e) => { drag.current = null; localStorage.setItem('moodaily-widget-pos', JSON.stringify(pos)); }}
+          >
+            {[0,1,2].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.8)' }} />)}
+          </div>
         </div>
 
         <style>{`
