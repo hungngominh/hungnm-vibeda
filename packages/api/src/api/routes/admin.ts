@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { successResponse, failResponse } from '@vegabase/core';
 import { Argon2idHasher } from '@vegabase/api';
 import { prisma } from '../../infrastructure/prisma.js';
+import { jwtSign } from '../utils/jwt-sign.js';
+import { env } from '../../env.js';
 
 const loginSchema = z.object({
   username: z.string().min(1),
@@ -30,9 +32,9 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
       );
     }
 
-    const token = (req.server as any).jwt.sign(
+    const token = jwtSign(
       { sub: user.username, roles: ['admin'] },
-      { expiresIn: '8h' },
+      { secret: env.JWT_SECRET, issuer: env.JWT_ISSUER, audience: env.JWT_AUDIENCE, expiresIn: 8 * 3600 },
     );
 
     return reply.send(successResponse({ token }, traceId));
