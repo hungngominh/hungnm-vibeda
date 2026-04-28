@@ -10,8 +10,6 @@ declare global {
         'environment-image'?: string;
         'shadow-intensity'?: string;
         exposure?: string;
-        'field-of-view'?: string;
-        'min-camera-orbit'?: string;
       };
     }
   }
@@ -30,10 +28,9 @@ interface ModelViewerProps {
   mascot: MascotKey;
   style?: React.CSSProperties;
   cameraControls?: boolean;
-  fieldOfView?: string;
 }
 
-export function ModelViewer({ mascot, style, cameraControls, fieldOfView }: ModelViewerProps) {
+export function ModelViewer({ mascot, style, cameraControls }: ModelViewerProps) {
   return (
     <model-viewer
       src={MASCOT_FILES[mascot]}
@@ -44,8 +41,6 @@ export function ModelViewer({ mascot, style, cameraControls, fieldOfView }: Mode
       environment-image="neutral"
       shadow-intensity="0.6"
       exposure="1.1"
-      field-of-view={fieldOfView}
-      min-camera-orbit={fieldOfView ? `auto auto 100%` : undefined}
       style={{ width: '100%', height: '100%', ...style }}
     />
   );
