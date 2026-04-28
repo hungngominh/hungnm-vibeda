@@ -26,6 +26,16 @@ interface LayoutWord {
 
 const WORD_COLORS = ['var(--primary)', 'var(--secondary)', 'var(--tertiary)'];
 
+const STYLE_SHEET = `
+.word-cloud-phrase { transition: transform 120ms ease-out; }
+.word-cloud-phrase:hover { transform: translate(-50%, -50%) scale(1.05) rotate(var(--rotate, 0deg)) !important; }
+.word-cloud-tooltip { animation: word-cloud-tooltip-in 120ms ease-out; }
+@keyframes word-cloud-tooltip-in {
+  from { opacity: 0; transform: translate(-50%, -100%) scale(0.9); }
+  to { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+}
+`;
+
 interface SelectedPhrase {
   phrase: string;
   count: number;
@@ -83,6 +93,14 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
       return { ...prev, x: current.x, y: current.y, size: current.size };
     });
   }, [layoutWords]);
+
+  useEffect(() => {
+    if (document.getElementById('word-cloud-styles')) return;
+    const s = document.createElement('style');
+    s.id = 'word-cloud-styles';
+    s.textContent = STYLE_SHEET;
+    document.head.appendChild(s);
+  }, []);
 
   useEffect(() => {
     if (!words.length) {
@@ -184,6 +202,7 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
           {layoutWords.map(({ text, size, x, y, rotate, color }) => (
             <span
               key={text}
+              className="word-cloud-phrase"
               onClick={(e) => {
                 e.stopPropagation();
                 const wordData = words.find(w => w.phrase === text);
@@ -201,6 +220,7 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
                 fontSize: size,
                 fontWeight: 800,
                 color,
+                ['--rotate' as any]: `${rotate}deg`,
                 transform: `translate(-50%, -50%) rotate(${rotate}deg)`,
                 lineHeight: 1,
                 letterSpacing: '-0.01em',
@@ -215,6 +235,7 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
           {selected && tooltipPos && (
             <div
               ref={tooltipRef}
+              className="word-cloud-tooltip"
               style={{
                 position: 'absolute',
                 left: tooltipPos.left,
