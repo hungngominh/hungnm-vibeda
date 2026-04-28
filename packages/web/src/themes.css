@@ -1,59 +1,169 @@
-/* Default theme: Chick (amber) */
+/* ═══════════════════════════════════════════
+   Moodaily — Design Tokens (Material 3 / Kawaii v3)
+   ═══════════════════════════════════════════ */
+
+/* Shared scale tokens — not theme-specific */
 :root {
   --font: 'Plus Jakarta Sans', sans-serif;
-  --radius: 16px;
-  --radius-sm: 8px;
-  --surface: #fff8e8;
-  --primary: #b8690a;
-  --primary-container: #f5d9a8;
-  --on-primary-container: #5c3200;
-  --secondary: #c47e2a;
-  --secondary-container: #faecd4;
-  --text: #3a2800;
-  --text-secondary: #7a5c2e;
-  --border: #e8d5a8;
-  --shadow: 0 2px 12px rgba(184, 105, 10, 0.10);
+
+  --r-sm:   0.5rem;   /* 8px  */
+  --r:      1rem;     /* 16px */
+  --r-md:   1.5rem;   /* 24px */
+  --r-lg:   2rem;     /* 32px */
+  --r-xl:   3rem;     /* 48px */
+  --r-full: 9999px;
+
+  --pad-container: 24px;
+  --stack-sm:      12px;
+  --stack-md:      20px;
 }
 
+/* ── Chick (warm yellow + mint) — matches design-preview exactly ── */
+:root,
+[data-theme="chick"] {
+  --surface:            #fff9ea;
+  --surface-container:  #faefb8;
+  --container-lowest:   #ffffff;
+
+  --on-surface:         #201c00;
+  --on-surface-variant: #3e4945;
+  --outline:            #6e7a74;
+  --outline-variant:    #bec9c3;
+
+  --primary:              #006b55;
+  --primary-container:    #87dcc0;
+  --primary-fixed:        #9ef3d6;
+  --primary-fixed-dim:    #82d7bb;
+  --on-primary:           #ffffff;
+  --on-primary-container: #00624d;
+
+  --secondary:              #864d61;
+  --secondary-container:    #fdb5cc;
+  --secondary-fixed:        #ffd9e3;
+  --secondary-fixed-dim:    #fab3ca;
+  --on-secondary:           #ffffff;
+  --on-secondary-container: #7a4357;
+
+  --tertiary:              #30628a;
+  --tertiary-container:    #a1d1fe;
+  --tertiary-fixed:        #cde5ff;
+  --on-tertiary:           #ffffff;
+  --on-tertiary-container: #265a81;
+
+  --shadow-soft: 0 4px 18px rgba(134, 77, 97, 0.08);
+  --shadow-mint: 0 8px 24px rgba(0, 107, 85, 0.15);
+  --shadow-pink: 0 8px 24px rgba(134, 77, 97, 0.15);
+}
+
+/* ── Axolotl (pink/red) ── */
 [data-theme="axolotl"] {
-  --surface: #fff0f2;
-  --primary: #c0284a;
-  --primary-container: #f5b8c4;
+  --surface:            #fff0f2;
+  --surface-container:  #f5d0d8;
+  --container-lowest:   #ffffff;
+
+  --on-surface:         #3d0015;
+  --on-surface-variant: #8a3a50;
+  --outline:            #d080a0;
+  --outline-variant:    #f0c0ca;
+
+  --primary:              #c0284a;
+  --primary-container:    #f5b8c4;
+  --primary-fixed:        #ffd8de;
+  --primary-fixed-dim:    #f5b8c4;
+  --on-primary:           #ffffff;
   --on-primary-container: #6b0020;
-  --secondary: #d4607a;
-  --secondary-container: #fad4dc;
-  --text: #3d0015;
-  --text-secondary: #8a3a50;
-  --border: #f0c0ca;
-  --shadow: 0 2px 12px rgba(192, 40, 74, 0.10);
+
+  --secondary:              #d4607a;
+  --secondary-container:    #fad4dc;
+  --secondary-fixed:        #ffe0e8;
+  --secondary-fixed-dim:    #f5c0cc;
+  --on-secondary:           #ffffff;
+  --on-secondary-container: #8a3050;
+
+  --tertiary:              #6050a0;
+  --tertiary-container:    #c8b8f0;
+  --tertiary-fixed:        #e0d8f8;
+  --on-tertiary:           #ffffff;
+  --on-tertiary-container: #3a2880;
+
+  --shadow-soft: 0 4px 18px rgba(192, 40, 74, 0.08);
+  --shadow-mint: 0 8px 24px rgba(192, 40, 74, 0.15);
+  --shadow-pink: 0 8px 24px rgba(212, 96, 122, 0.15);
 }
 
+/* ── Mocha (warm brown) ── */
 [data-theme="mocha"] {
-  --surface: #fdf5ec;
-  --primary: #7a5230;
-  --primary-container: #e0c4a0;
+  --surface:            #fdf5ec;
+  --surface-container:  #f0e0c8;
+  --container-lowest:   #ffffff;
+
+  --on-surface:         #2e1800;
+  --on-surface-variant: #7a5230;
+  --outline:            #c0a080;
+  --outline-variant:    #e0c4a0;
+
+  --primary:              #7a5230;
+  --primary-container:    #e0c4a0;
+  --primary-fixed:        #f5dcc0;
+  --primary-fixed-dim:    #e0c4a0;
+  --on-primary:           #ffffff;
   --on-primary-container: #3d2210;
-  --secondary: #c4956a;
-  --secondary-container: #f5e0cc;
-  --text: #2e1800;
-  --text-secondary: #7a5230;
-  --border: #e0c4a0;
-  --shadow: 0 2px 12px rgba(122, 82, 48, 0.10);
+
+  --secondary:              #c4956a;
+  --secondary-container:    #f5e0cc;
+  --secondary-fixed:        #faecd4;
+  --secondary-fixed-dim:    #f0d8b8;
+  --on-secondary:           #ffffff;
+  --on-secondary-container: #8a5030;
+
+  --tertiary:              #4a6880;
+  --tertiary-container:    #b0c8e0;
+  --tertiary-fixed:        #d8e8f4;
+  --on-tertiary:           #ffffff;
+  --on-tertiary-container: #284858;
+
+  --shadow-soft: 0 4px 18px rgba(122, 82, 48, 0.08);
+  --shadow-mint: 0 8px 24px rgba(122, 82, 48, 0.15);
+  --shadow-pink: 0 8px 24px rgba(196, 149, 106, 0.15);
 }
 
+/* ── Whale (ocean blue) ── */
 [data-theme="whale"] {
-  --surface: #f0f6ff;
-  --primary: #1e6fa8;
-  --primary-container: #7ec4ef;
+  --surface:            #f0f6ff;
+  --surface-container:  #d0e8f8;
+  --container-lowest:   #ffffff;
+
+  --on-surface:         #0a2840;
+  --on-surface-variant: #2a5a7a;
+  --outline:            #80b0d8;
+  --outline-variant:    #b8d8f0;
+
+  --primary:              #1e6fa8;
+  --primary-container:    #7ec4ef;
+  --primary-fixed:        #cde5ff;
+  --primary-fixed-dim:    #a1d1fe;
+  --on-primary:           #ffffff;
   --on-primary-container: #0d3d62;
-  --secondary: #2e8b7a;
-  --secondary-container: #a8e6df;
-  --text: #0a2840;
-  --text-secondary: #2a5a7a;
-  --border: #b8d8f0;
-  --shadow: 0 2px 12px rgba(30, 111, 168, 0.10);
+
+  --secondary:              #2e8b7a;
+  --secondary-container:    #a8e6df;
+  --secondary-fixed:        #c8f0ea;
+  --secondary-fixed-dim:    #a0e0d8;
+  --on-secondary:           #ffffff;
+  --on-secondary-container: #1a5850;
+
+  --tertiary:              #7060b0;
+  --tertiary-container:    #c8c0e8;
+  --tertiary-fixed:        #e0d8f8;
+  --on-tertiary:           #ffffff;
+  --on-tertiary-container: #4030a0;
+
+  --shadow-soft: 0 4px 18px rgba(30, 111, 168, 0.08);
+  --shadow-mint: 0 8px 24px rgba(30, 111, 168, 0.15);
+  --shadow-pink: 0 8px 24px rgba(46, 139, 122, 0.15);
 }
 
+/* ── Global reset ── */
 *,
 *::before,
 *::after {
@@ -65,7 +175,7 @@
 body {
   font-family: var(--font);
   background: var(--surface);
-  color: var(--text);
+  color: var(--on-surface);
   min-height: 100vh;
   transition: background 0.3s ease, color 0.3s ease;
 }
