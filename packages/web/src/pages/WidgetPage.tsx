@@ -141,7 +141,7 @@ export function WidgetPage() {
 
         {/* Mascot bubble — drag xoay, tap ngắn mở popup */}
         <div
-          style={{ position: 'fixed', bottom: 20, right: 20, width: 80, height: 80, zIndex: 100 }}
+          style={{ position: 'fixed', bottom: 10, right: 16, width: 90, height: 110, zIndex: 100 }}
           onPointerDown={(e) => { (e.currentTarget as any)._startX = e.clientX; (e.currentTarget as any)._startY = e.clientY; }}
           onPointerUp={(e) => {
             const dx = e.clientX - (e.currentTarget as any)._startX;
