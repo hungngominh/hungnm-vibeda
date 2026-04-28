@@ -220,7 +220,7 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
                 fontSize: size,
                 fontWeight: 800,
                 color,
-                ['--rotate' as any]: `${rotate}deg`,
+                ...({ '--rotate': `${rotate}deg` } as React.CSSProperties),
                 transform: `translate(-50%, -50%) rotate(${rotate}deg)`,
                 lineHeight: 1,
                 letterSpacing: '-0.01em',
