@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Moodaily embed — demo host page</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #f4f0e6; color: #2a2a2a; }
+    main { max-width: 720px; margin: 0 auto; padding: 48px 24px 200px; }
+    h1 { margin: 0 0 16px; }
+    p { line-height: 1.6; }
+    button { padding: 10px 20px; margin: 8px 8px 8px 0; border: 1px solid #ccc; background: #fff; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #eee; }
+    input, textarea { display: block; margin: 8px 0; padding: 8px 12px; width: 100%; max-width: 400px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
+    .card { background: #fff; padding: 20px; border-radius: 12px; margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Trang giả lập website nhúng Moodaily</h1>
+    <p>Mục đích: kiểm tra widget Moodaily không chặn các tương tác trên trang chủ. Nếu mọi nút/ô input bên dưới đều bấm và gõ được bình thường — và bubble vàng góc dưới phải vẫn mở popup được — thì embed chạy đúng.</p>
+
+    <div class="card">
+      <h2>Khu test bấm</h2>
+      <button onclick="alert('Click 1 hoạt động ✓')">Bấm thử 1</button>
+      <button onclick="alert('Click 2 hoạt động ✓')">Bấm thử 2</button>
+      <button onclick="document.getElementById('out').textContent = 'Counter: ' + (++window._n || 1)">Tăng counter</button>
+      <p id="out">—</p>
+    </div>
+
+    <div class="card">
+      <h2>Khu test gõ phím</h2>
+      <input placeholder="Gõ thử text input..." />
+      <textarea placeholder="Gõ thử textarea..." rows="4"></textarea>
+    </div>
+
+    <div class="card">
+      <h2>Khu test scroll</h2>
+      <p>Cuộn trang lên xuống để chắc bubble không cản scroll.</p>
+      <div style="height:600px; background: linear-gradient(#fff, #ddd); border-radius: 8px;"></div>
+    </div>
+  </main>
+
+  <!-- Đổi src về domain Moodaily thật khi deploy. Trong dev mở file qua http://localhost:5173/embed-demo.html -->
+  <script src="/embed.js"></script>
+</body>
+</html>

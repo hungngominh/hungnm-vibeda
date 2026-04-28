@@ -30,6 +30,28 @@ export function EmployeeHome() {
   const today = toDateStr(new Date());
   const words = useCloudSocket(initialWords, date === today);
 
+  // Iframe widget overlay: always full-screen. CSS clip-path controls which area of the iframe
+  // intercepts events — clipped-out areas let clicks pass through to EmployeeHome behind it.
+  // Initial: clip everything (iframe inert) until widget mounts and signals its bubble bounds.
+  // Widget posts 'expanded' (popup open / dragging) → no clip.
+  // Widget posts 'idle' with bubble bounds → clip to that small box.
+  const [widgetClip, setWidgetClip] = useState<string>('inset(50% 50% 50% 50%)');
+
+  useEffect(() => {
+    function onMsg(e: MessageEvent) {
+      if (e.data?.type !== 'moodaily-widget') return;
+      if (e.data.mode === 'expanded') {
+        setWidgetClip('none');
+      } else if (e.data.mode === 'idle') {
+        const b = e.data.bubble as { x: number; y: number; w: number; h: number };
+        const winW = window.innerWidth, winH = window.innerHeight;
+        setWidgetClip(`inset(${b.y}px ${winW - b.x - b.w}px ${winH - b.y - b.h}px ${b.x}px)`);
+      }
+    }
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
   function applyMascot(key: MascotKey) {
     setMascot(key);
     localStorage.setItem('moodaily-mascot', key);
@@ -83,8 +105,8 @@ export function EmployeeHome() {
 
         {/* Mascot */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24, gap: 10 }}>
-          <div style={{ width: 220, height: 260 }}>
-            <ModelViewer mascot={mascot} cameraControls />
+          <div style={{ width: 150, height: 180, overflow: 'hidden' }}>
+            <ModelViewer mascot={mascot} cameraControls cameraOrbit="auto auto 220%" />
           </div>
           <button
             onClick={() => setShowPicker(true)}
@@ -196,7 +218,8 @@ export function EmployeeHome() {
       </main>
 
 
-      {/* Widget iframe overlay */}
+      {/* Widget iframe overlay — full-screen, clip-path adjusts based on widget state so events
+          outside the bubble/popup area pass through to EmployeeHome */}
       <iframe
         src="/widget"
         style={{
@@ -204,7 +227,7 @@ export function EmployeeHome() {
           width: '100%', height: '100%',
           border: 'none', zIndex: 100,
           background: 'transparent',
-          pointerEvents: 'none',
+          clipPath: widgetClip,
         }}
         // @ts-expect-error allowtransparency is non-standard
         allowTransparency="true"

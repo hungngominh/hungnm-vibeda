@@ -9,6 +9,7 @@ import type { MascotKey } from '../components/ModelViewer';
 import type { WordItem } from '../components/WordCloud';
 
 const W = 90, H = 110; // bubble size
+const PAD = 14;        // padding around bubble when iframe is in idle (small) mode
 
 // localStorage may be blocked in cross-origin iframes (Chrome 115+ third-party storage partitioning)
 const store = {
@@ -30,10 +31,35 @@ export function WidgetPage() {
   const [submitted, setSubmitted]       = useState(false);
   const [initialWords, setInitialWords] = useState<WordItem[]>([]);
   const [pos, setPos]                   = useState<{ x: number; y: number }>(loadPos);
+  const [isDragging, setIsDragging]     = useState(false);
   const [mascot, setMascot]             = useState<MascotKey>(
     () => (store.get('moodaily-mascot') as MascotKey | null) ?? 'chick',
   );
   const drag = useRef<{ startPX: number; startPY: number; startX: number; startY: number } | null>(null);
+
+  // Tell host (EmployeeHome) which area of the (always full-screen) iframe should intercept
+  // events. When popup is open or user is dragging, iframe must be fully interactive (no clip).
+  // Otherwise only the small box around the bubble — rest of iframe is clipped so EmployeeHome
+  // behind it stays clickable.
+  const expanded = isOpen || isDragging;
+  function postState() {
+    if (window.parent === window) return;
+    if (expanded) {
+      window.parent.postMessage({ type: 'moodaily-widget', mode: 'expanded' }, '*');
+    } else {
+      window.parent.postMessage({
+        type: 'moodaily-widget', mode: 'idle',
+        bubble: { x: pos.x - PAD, y: pos.y - PAD, w: W + PAD * 2, h: H + PAD * 2 },
+      }, '*');
+    }
+  }
+  useEffect(() => { postState(); }, [expanded, pos.x, pos.y]);
+  useEffect(() => {
+    const onResize = () => postState();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expanded, pos.x, pos.y]);
 
   const today = new Date().toISOString().slice(0, 10);
   const words = useCloudSocket(initialWords, true);
@@ -62,6 +88,7 @@ export function WidgetPage() {
   function onBubblePointerDown(e: React.PointerEvent) {
     drag.current = { startPX: e.clientX, startPY: e.clientY, startX: pos.x, startY: pos.y };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setIsDragging(true);
   }
 
   function onBubblePointerMove(e: React.PointerEvent) {
@@ -75,12 +102,11 @@ export function WidgetPage() {
     if (!drag.current) return;
     const dx = e.clientX - drag.current.startPX;
     const dy = e.clientY - drag.current.startPY;
-    if (Math.sqrt(dx * dx + dy * dy) < 5) {
-      setIsOpen(o => !o);
-    } else {
+    if (Math.sqrt(dx * dx + dy * dy) >= 5) {
       store.set('moodaily-widget-pos', JSON.stringify(pos));
     }
     drag.current = null;
+    setIsDragging(false);
   }
 
   // Popup: appear above/beside bubble, clamped to viewport
@@ -90,9 +116,9 @@ export function WidgetPage() {
 
   return (
     <>
-      <style>{`html,body{pointer-events:none;background:transparent;}`}</style>
+      <style>{`html,body{background:transparent;}`}</style>
 
-      <div style={{ pointerEvents: 'auto' }}>
+      <div>
 
         {/* Click-outside overlay */}
         {isOpen && (
@@ -167,11 +193,16 @@ export function WidgetPage() {
           </div>
         )}
 
-        {/* Mascot bubble */}
-        <div style={{ position: 'fixed', left: pos.x, top: pos.y, width: W, height: H, zIndex: 100 }}>
+        {/* Mascot bubble — always at saved screen pos; iframe is always full-screen, host clips
+            non-bubble area when idle so events pass through to EmployeeHome */}
+        <div style={{
+          position: 'fixed',
+          left: pos.x, top: pos.y,
+          width: W, height: H, zIndex: 100,
+        }}>
           {/* Model — xoay bằng cameraControls, tap mở popup */}
           <div style={{ width: '100%', height: '100%' }} onClick={() => setIsOpen(o => !o)}>
-            <ModelViewer mascot={mascot} cameraControls fieldOfView="90deg" />
+            <ModelViewer mascot={mascot} cameraControls cameraOrbit="auto auto 150%" />
           </div>
 
           {/* Drag handle — kéo để di chuyển */}
@@ -186,7 +217,7 @@ export function WidgetPage() {
             }}
             onPointerDown={onBubblePointerDown}
             onPointerMove={onBubblePointerMove}
-            onPointerUp={(e) => { drag.current = null; localStorage.setItem('moodaily-widget-pos', JSON.stringify(pos)); }}
+            onPointerUp={onBubblePointerUp}
           >
             {[0,1,2].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.8)' }} />)}
           </div>
