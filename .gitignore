@@ -7,3 +7,5 @@ packages/api/.env
 .env
 .DS_Store
 .worktrees/
+.superpowers/
+design-preview.html
