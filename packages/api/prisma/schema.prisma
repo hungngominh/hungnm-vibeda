@@ -1,0 +1,54 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model MoodEntry {
+  id             String        @id
+  rawText        String
+  isDeleted      Boolean       @default(false)
+  logCreatedDate DateTime
+  logCreatedBy   String
+  logUpdatedDate DateTime?
+  logUpdatedBy   String?
+
+  clusters       MoodCluster[]
+
+  @@index([isDeleted])
+  @@index([logCreatedDate, isDeleted])
+}
+
+model MoodCluster {
+  id             String     @id
+  entryId        String
+  phrase         String
+  isDeleted      Boolean    @default(false)
+  logCreatedDate DateTime
+  logCreatedBy   String
+  logUpdatedDate DateTime?
+  logUpdatedBy   String?
+
+  entry          MoodEntry  @relation(fields: [entryId], references: [id])
+
+  @@index([isDeleted])
+  @@index([entryId, isDeleted])
+  @@index([logCreatedDate, isDeleted])
+}
+
+model User {
+  id             String    @id
+  username       String
+  passwordHash   String
+  isDeleted      Boolean   @default(false)
+  logCreatedDate DateTime
+  logCreatedBy   String
+  logUpdatedDate DateTime?
+  logUpdatedBy   String?
+
+  @@unique([username, isDeleted])
+  @@index([isDeleted])
+}
