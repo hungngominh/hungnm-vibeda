@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import fastifyStatic from '@fastify/static';
 import fastifyWebSocket from '@fastify/websocket';
 import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { errorHandlerPlugin, vegabaseJwtPlugin, callerInfoPlugin } from '@vegabase/api';
 import { env } from '../env.js';
@@ -59,13 +60,14 @@ export async function buildServer() {
   // Static files: serve built React SPA in production
   const publicPath = join(__dirname, '../../public');
   try {
+    const indexHtml = readFileSync(join(publicPath, 'index.html'), 'utf-8');
     await app.register(fastifyStatic, {
       root: publicPath,
       prefix: '/',
       decorateReply: false,
     });
     app.setNotFoundHandler((_req, reply) => {
-      reply.sendFile('index.html');
+      reply.type('text/html').send(indexHtml);
     });
   } catch {
     // public/ folder absent in dev — skip static serving
