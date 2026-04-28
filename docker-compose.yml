@@ -10,9 +10,16 @@ services:
       args:
         VEGABASE_REPO: https://github.com/hungngominh/vegabase-node.git
     ports:
-      - "3000:3000"
-    env_file:
-      - .env
+      - "3777:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER:-moodaily}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-moodaily-client}
+      PORT: 3000
+      AI_PROVIDER: ${AI_PROVIDER:-gemini}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     restart: unless-stopped
     healthcheck:
       test:
