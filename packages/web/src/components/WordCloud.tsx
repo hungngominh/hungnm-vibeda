@@ -42,7 +42,18 @@ interface WordCloudProps {
 export function WordCloud({ words, height = 320 }: WordCloudProps) {
   const [layoutWords, setLayoutWords] = useState<LayoutWord[]>([]);
   const [selected, setSelected] = useState<SelectedPhrase | null>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipBox, setTooltipBox] = useState<{ w: number; h: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!selected || !tooltipRef.current) {
+      setTooltipBox(null);
+      return;
+    }
+    const el = tooltipRef.current;
+    setTooltipBox({ w: el.offsetWidth, h: el.offsetHeight });
+  }, [selected]);
 
   useEffect(() => {
     if (!selected) return;
@@ -99,6 +110,29 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
       })
       .start();
   }, [words, height]);
+
+  const containerW = containerRef.current?.offsetWidth ?? 0;
+  const tooltipPos = (() => {
+    if (!selected) return null;
+    const w = tooltipBox?.w ?? 200; // ước lượng cho lần render đầu trước khi đo được
+    const h = tooltipBox?.h ?? 36;
+
+    // Vertical: default above, flip xuống nếu sát top
+    const aboveTop = selected.y - selected.size / 2 - 8 - h;
+    const flipDown = aboveTop < 8;
+    const top = flipDown
+      ? selected.y + selected.size / 2 + 8
+      : selected.y - selected.size / 2 - 8;
+    const transformY = flipDown ? '0' : '-100%';
+
+    // Horizontal: clamp trong [8, containerW - 8 - w]
+    const idealLeft = selected.x - w / 2;
+    const clampedLeft = Math.max(8, Math.min(containerW - 8 - w, idealLeft));
+    const left = clampedLeft + w / 2; // back to center coords (sẽ apply translate(-50%, ...))
+    const arrowOffsetPx = selected.x - clampedLeft; // arrow distance từ left edge của tooltip
+
+    return { top, left, transformY, flipDown, arrowOffsetPx, w };
+  })();
 
   return (
     <div
@@ -157,13 +191,14 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
               {text}
             </span>
           ))}
-          {selected && (
+          {selected && tooltipPos && (
             <div
+              ref={tooltipRef}
               style={{
                 position: 'absolute',
-                left: selected.x,
-                top: selected.y - selected.size / 2 - 8,
-                transform: 'translate(-50%, -100%)',
+                left: tooltipPos.left,
+                top: tooltipPos.top,
+                transform: `translate(-50%, ${tooltipPos.transformY})`,
                 background: 'var(--container-lowest)',
                 borderRadius: 'var(--r-md)',
                 boxShadow: 'var(--shadow-soft)',
@@ -179,6 +214,29 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
               Cụm này được chia sẻ{' '}
               <span style={{ color: 'var(--primary)', fontWeight: 800 }}>{selected.count}</span>{' '}
               lần
+              <span
+                style={{
+                  position: 'absolute',
+                  left: tooltipPos.arrowOffsetPx,
+                  ...(tooltipPos.flipDown
+                    ? {
+                        top: -6,
+                        borderLeft: '6px solid transparent',
+                        borderRight: '6px solid transparent',
+                        borderBottom: '6px solid var(--container-lowest)',
+                      }
+                    : {
+                        bottom: -6,
+                        borderLeft: '6px solid transparent',
+                        borderRight: '6px solid transparent',
+                        borderTop: '6px solid var(--container-lowest)',
+                      }),
+                  transform: 'translateX(-50%)',
+                  width: 0,
+                  height: 0,
+                  filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.06))',
+                }}
+              />
             </div>
           )}
         </div>
