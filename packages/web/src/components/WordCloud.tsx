@@ -26,6 +26,14 @@ interface LayoutWord {
 
 const WORD_COLORS = ['var(--primary)', 'var(--secondary)', 'var(--tertiary)'];
 
+interface SelectedPhrase {
+  phrase: string;
+  count: number;
+  x: number;
+  y: number;
+  size: number;
+}
+
 interface WordCloudProps {
   words: WordItem[];
   height?: number;
@@ -33,7 +41,17 @@ interface WordCloudProps {
 
 export function WordCloud({ words, height = 320 }: WordCloudProps) {
   const [layoutWords, setLayoutWords] = useState<LayoutWord[]>([]);
+  const [selected, setSelected] = useState<SelectedPhrase | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelected(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selected]);
 
   useEffect(() => {
     if (!words.length) {
@@ -104,10 +122,23 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
           Chưa có cảm xúc nào được chia sẻ hôm nay
         </div>
       ) : (
-        <div style={{ position: 'relative', height }}>
+        <div
+          style={{ position: 'relative', height }}
+          onClick={() => setSelected(null)}
+        >
           {layoutWords.map(({ text, size, x, y, rotate, color }) => (
             <span
               key={text}
+              onClick={(e) => {
+                e.stopPropagation();
+                const wordData = words.find(w => w.phrase === text);
+                if (!wordData) return;
+                setSelected(prev =>
+                  prev?.phrase === text
+                    ? null
+                    : { phrase: text, count: wordData.count, x, y, size }
+                );
+              }}
               style={{
                 position: 'absolute',
                 left: x,
@@ -119,13 +150,37 @@ export function WordCloud({ words, height = 320 }: WordCloudProps) {
                 lineHeight: 1,
                 letterSpacing: '-0.01em',
                 userSelect: 'none',
-                cursor: 'default',
+                cursor: 'pointer',
                 whiteSpace: 'nowrap',
               }}
             >
               {text}
             </span>
           ))}
+          {selected && (
+            <div
+              style={{
+                position: 'absolute',
+                left: selected.x,
+                top: selected.y - selected.size / 2 - 8,
+                transform: 'translate(-50%, -100%)',
+                background: 'var(--container-lowest)',
+                borderRadius: 'var(--r-md)',
+                boxShadow: 'var(--shadow-soft)',
+                padding: '8px 12px',
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--on-surface)',
+                whiteSpace: 'nowrap',
+                pointerEvents: 'none',
+                zIndex: 10,
+              }}
+            >
+              Cụm này được chia sẻ{' '}
+              <span style={{ color: 'var(--primary)', fontWeight: 800 }}>{selected.count}</span>{' '}
+              lần
+            </div>
+          )}
         </div>
       )}
     </div>
