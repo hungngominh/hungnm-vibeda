@@ -69,7 +69,7 @@ export function EmployeeHome() {
           <ModelViewer mascot={mascot} cameraControls />
         </div>
 
-        <MoodInput onSubmit={text => api.submitMood(text)} />
+        <MoodInput onSubmit={async (text) => { await api.submitMood(text); }} />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, margin: '32px 0 16px' }}>
           <button
