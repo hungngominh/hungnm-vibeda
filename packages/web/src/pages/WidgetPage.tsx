@@ -170,15 +170,7 @@ export function WidgetPage() {
         {/* Mascot bubble */}
         <div style={{ position: 'fixed', left: pos.x, top: pos.y, width: W, height: H, zIndex: 100 }}>
           {/* Model — xoay bằng cameraControls, tap mở popup */}
-          <div
-            style={{ width: '100%', height: '100%' }}
-            onPointerDown={(e) => { (e.currentTarget as any)._sx = e.clientX; (e.currentTarget as any)._sy = e.clientY; }}
-            onPointerUp={(e) => {
-              const dx = e.clientX - (e.currentTarget as any)._sx;
-              const dy = e.clientY - (e.currentTarget as any)._sy;
-              if (Math.sqrt(dx * dx + dy * dy) < 5) setIsOpen(o => !o);
-            }}
-          >
+          <div style={{ width: '100%', height: '100%' }} onClick={() => setIsOpen(o => !o)}>
             <ModelViewer mascot={mascot} cameraControls fieldOfView="90deg" />
           </div>
 
