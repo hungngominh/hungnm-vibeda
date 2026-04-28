@@ -40,7 +40,8 @@ export const moodRoutes: FastifyPluginAsync = async (app) => {
     }
 
     const entryResult = await executor.addAsync(
-      prisma.moodEntry,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      prisma.moodEntry as any,
       { rawText: body.rawText },
       'anonymous',
     );
@@ -54,7 +55,8 @@ export const moodRoutes: FastifyPluginAsync = async (app) => {
 
     if (clusters.length > 0) {
       await executor.addRangeAsync(
-        prisma.moodCluster,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        prisma.moodCluster as any,
         clusters.map(phrase => ({ entryId, phrase })),
         'anonymous',
       );

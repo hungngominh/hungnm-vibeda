@@ -14,7 +14,8 @@ const moodEntryService = new MoodEntryService(prisma, executor, permissionCache)
 const noOpSchema = z.object({}) as unknown as z.ZodType<any>;
 
 export const entriesController = createBaseController({
-  service: moodEntryService,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  service: moodEntryService as any,
   prefix: '/api/admin/entries',
   schemas: {
     list: moodEntryListSchema,
