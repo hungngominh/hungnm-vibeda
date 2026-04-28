@@ -5,7 +5,7 @@
   "scripts": {
     "dev:api": "pnpm --filter @moodaily/api dev",
     "dev:web": "pnpm --filter @moodaily/web dev",
-    "build": "pnpm --filter @moodaily/web build && cp -r mascot packages/api/public/mascot",
+    "build": "pnpm --filter @moodaily/web build && node -e \"require('fs').cpSync('mascot','packages/api/public/mascot',{recursive:true})\"",
     "test": "pnpm --filter @moodaily/api test"
   },
   "packageManager": "pnpm@9.0.0"
