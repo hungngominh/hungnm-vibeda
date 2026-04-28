@@ -17,11 +17,11 @@ function subtractDays(n: number) {
 
 type DateFilter = 'today' | 'week' | 'month' | 'all';
 
-const DATE_FILTER_OPTIONS: { key: DateFilter; label: string }[] = [
-  { key: 'today', label: 'Hôm nay' },
-  { key: 'week',  label: '7 ngày' },
-  { key: 'month', label: '30 ngày' },
-  { key: 'all',   label: 'Tất cả' },
+const FILTER_CONFIG: { key: DateFilter; label: string; chipVariant: 'mint' | 'pink' | 'blue' | 'yellow' }[] = [
+  { key: 'today', label: 'Hôm nay',  chipVariant: 'mint'   },
+  { key: 'week',  label: '7 ngày',   chipVariant: 'pink'   },
+  { key: 'month', label: '30 ngày',  chipVariant: 'blue'   },
+  { key: 'all',   label: 'Tất cả',   chipVariant: 'yellow' },
 ];
 
 export function AdminDashboard() {
@@ -87,66 +87,88 @@ export function AdminDashboard() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--surface)' }}>
+
+      {/* Header */}
       <header style={{
-        padding: '14px 32px', display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', borderBottom: '1px solid var(--border)',
-        background: '#fff',
+        padding: '20px var(--pad-container)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'var(--surface)',
       }}>
-        <span style={{ fontWeight: 700, fontSize: 18, color: 'var(--primary)' }}>Moodaily Admin</span>
-        <Button variant="ghost" size="sm" onClick={logout}>Đăng xuất</Button>
+        <div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--on-surface)', letterSpacing: '-0.01em' }}>
+            Mood Admin
+          </div>
+          <div style={{ fontSize: 16, color: 'var(--on-surface-variant)', marginTop: 2 }}>
+            Tổng quan cảm xúc nội bộ
+          </div>
+        </div>
+        <Button variant="secondary" size="sm" onClick={logout}>Đăng xuất</Button>
       </header>
 
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
-          <StatCard label="Hôm nay" value={stats.today} />
-          <StatCard label="7 ngày gần nhất" value={stats.week} />
-          <StatCard label="30 ngày gần nhất" value={stats.month} />
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '0 var(--pad-container) 40px' }}>
+
+        {/* Stats row */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+          <StatCard label="Hôm nay"   value={stats.today} variant="mint" />
+          <StatCard label="7 ngày"    value={stats.week}  variant="pink" />
+          <StatCard label="30 ngày"   value={stats.month} variant="blue" />
         </div>
 
+        {/* Filter chips + search */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16, alignItems: 'center' }}>
-          {DATE_FILTER_OPTIONS.map(f => (
+          {FILTER_CONFIG.map(f => (
             <Chip
               key={f.key}
               label={f.label}
+              variant={f.chipVariant}
               onClick={() => { setDateFilter(f.key); setPage(1); }}
-              style={{
-                background: dateFilter === f.key ? 'var(--primary)' : 'var(--primary-container)',
-                color: dateFilter === f.key ? '#fff' : 'var(--on-primary-container)',
-              }}
+              style={dateFilter === f.key ? { boxShadow: '0 0 0 2px var(--primary)' } : undefined}
             />
           ))}
           <input
-            placeholder="Tìm kiếm nội dung..."
+            placeholder="🔍 Tìm kiếm nội dung..."
             value={keyword}
             onChange={e => { setKeyword(e.target.value); setPage(1); }}
             style={{
-              marginLeft: 'auto', padding: '5px 14px', borderRadius: 20,
-              border: '1.5px solid var(--border)', fontFamily: 'var(--font)',
-              fontSize: 13, outline: 'none', background: 'var(--surface)', color: 'var(--text)',
+              marginLeft: 'auto',
+              padding: '8px 16px',
+              borderRadius: 'var(--r-full)',
+              border: '2px solid transparent',
+              background: 'var(--surface-container)',
+              fontFamily: 'var(--font)', fontSize: 13,
+              outline: 'none', color: 'var(--on-surface)',
+              transition: 'border-color 0.2s',
             }}
+            onFocus={e => { e.currentTarget.style.borderColor = 'var(--primary-fixed-dim)'; }}
+            onBlur={e => { e.currentTarget.style.borderColor = 'transparent'; }}
           />
         </div>
 
+        {/* Error */}
         {error && (
           <div style={{
-            background: '#fff3f3', border: '1px solid #e53935', borderRadius: 8,
+            background: '#fff3f3', border: '1px solid #e53935', borderRadius: 'var(--r)',
             padding: '12px 16px', color: '#c62828', fontSize: 14, marginBottom: 16,
           }}>
             {error}
           </div>
         )}
 
+        {/* Entry table */}
         <div style={{
-          background: '#fff', borderRadius: 'var(--radius)',
-          boxShadow: 'var(--shadow)', border: '1px solid var(--border)', overflow: 'hidden',
+          background: 'var(--container-lowest)',
+          borderRadius: 'var(--r-lg)',
+          boxShadow: 'var(--shadow-soft)',
+          overflow: 'hidden',
         }}>
           <EntryTable entries={entries} onDelete={id => setDeleteTarget(id)} />
         </div>
 
+        {/* Pagination */}
         {totalPages > 1 && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 16 }}>
             <Button size="sm" variant="ghost" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>←</Button>
-            <span style={{ padding: '6px 12px', color: 'var(--text)', fontSize: 14 }}>
+            <span style={{ padding: '6px 12px', color: 'var(--on-surface)', fontSize: 14 }}>
               {page} / {totalPages}
             </span>
             <Button size="sm" variant="ghost" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>→</Button>
