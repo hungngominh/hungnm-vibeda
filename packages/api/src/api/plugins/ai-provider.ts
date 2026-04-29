@@ -18,34 +18,19 @@ function parseClusterResponse(raw: string): string[] {
   return [];
 }
 
-const SYSTEM_PROMPT = `Trích xuất cụm từ từ câu tiếng Việt. Return JSON array ONLY, không markdown, không backtick, không giải thích.
+const SYSTEM_PROMPT = `Extract meaningful phrase clusters from Vietnamese text.
 
-QUY TẮC:
-1. Chỉ dùng NGUYÊN VĂN từ trong câu.
-2. Mỗi cụm = những từ LIỀN KỀ NHAU (không có khoảng trống giữa từ).
-3. LOẠI BỎ TOÀN BỘ cụm trùng lắp: Nếu cụm A chứa trong cụm B (A là substring liên tục của B), xoá A, giữ B.
-4. Nếu câu toàn vô nghĩa (aaaaa, zzzz), trả [].
-5. Tối đa 6 cụm. Ưu tiên cụm dài, loại bỏ cụm con.
+RULES:
+1. Use EXACT words from input only. Never infer, add, or paraphrase words.
+2. Each cluster = 2-5 adjacent words (no gaps, no punctuation between words).
+3. Remove overlapping clusters: if "a b c" and "b c" both extracted, keep only "a b c".
+4. If input is pure nonsense (aaaaa, zzzz, random gibberish), return [].
+5. Target 2-4 clusters. Avoid including single-word or very short (1-2 word) trivial phrases.
+6. Punctuation (comma, period) acts as a boundary - don't include punctuation marks in clusters.
 
-ALGORITHM:
-- Bước 1: Tìm TẤT CẢ chuỗi 2-5 từ liền kề.
-- Bước 2: XÓA BỎ mọi cụm là substring của cụm khác.
-- Bước 3: Giữ tối đa 6 cụm còn lại.
-- Bước 4: Return CHỈ JSON array.
-
-VÍ DỤ:
-Input: "hôm nay tôi vui vẻ và hạnh phúc"
-Candidates: [hôm nay, nay tôi, tôi vui, vui vẻ, vẻ và, và hạnh, hạnh phúc, hôm nay tôi, nay tôi vui, tôi vui vẻ, vui vẻ và, vẻ và hạnh, và hạnh phúc, hôm nay tôi vui, ...]
-After dedup: ["vui vẻ", "hạnh phúc"] (xoá những cụm không ý nghĩa)
-Output: ["vui vẻ", "hạnh phúc"]
-
-Input: "tui mùn dia quế cup cầu"
-Candidates: [tui mùn, mùn dia, dia quế, cup cầu, tui mùn dia, mùn dia quế, dia quế cup, quế cup cầu, tui mùn dia quế, mùn dia quế cup, dia quế cup cầu, ...]
-Keep meaningful: [tui mùn, mùn dia quế, cup cầu] → xoá "tui mùn" vì nó là substring của "tui mùn dia quế"
-Output: ["mùn dia quế", "cup cầu"]
-
-Input: "bữn ngủ, phải nghe nhạc thôi"
-Output: ["bữn ngủ", "phải nghe nhạc", "nhạc thôi"] → Hoặc ["bữn ngủ", "phải nghe nhạc thôi"] (loại substring)`;
+OUTPUT: Return ONLY a JSON array. NO markdown, NO backticks, NO explanation, NO other text.
+CORRECT examples: ["chi muốn", "trânh nóng"]  or  ["buồn ngủ", "phải nghe nhạc"]  or  []
+WRONG: \`\`\`json [...]\`\`\`  or  [...] plus explanation text.`;
 
 class OpenAiProvider implements AiProvider {
   private client: OpenAI;
