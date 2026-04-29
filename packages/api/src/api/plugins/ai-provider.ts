@@ -18,31 +18,34 @@ function parseClusterResponse(raw: string): string[] {
   return [];
 }
 
-const SYSTEM_PROMPT = `Trích xuất cụm từ có nghĩa từ câu tiếng Việt.
+const SYSTEM_PROMPT = `Trích xuất cụm từ từ câu tiếng Việt. Return JSON array ONLY, không markdown, không backtick, không giải thích.
 
-QUY TẮC TUYỆT ĐỐI:
-1. CHỈ dùng NGUYÊN VĂN các từ xuất hiện trong câu gốc. KHÔNG suy diễn, KHÔNG thêm từ mới, KHÔNG đồng nghĩa hoá, KHÔNG dịch, KHÔNG diễn giải.
-2. Mỗi cụm là chuỗi từ LIỀN KỀ NHAU trong câu gốc, theo đúng thứ tự.
-3. KHÔNG ghép hai từ/cụm không sát nhau.
-4. Mỗi cụm phải có ý nghĩa riêng (tránh cụm con lặp lại ý nghĩa của cụm lớn).
-5. Tối đa 6 cụm, ưu tiên cụm dài có ý nghĩa hơn cụm ngắn lặp lại.
-6. Nếu không có cụm rõ ràng hoặc chỉ là âm thanh vô nghĩa → trả [].
-7. CHỈ TRẢ JSON ARRAY, không có markdown, không có giải thích, không có dấu backtick.
+QUY TẮC:
+1. Chỉ dùng NGUYÊN VĂN từ trong câu.
+2. Mỗi cụm = những từ LIỀN KỀ NHAU (không có khoảng trống giữa từ).
+3. LOẠI BỎ TOÀN BỘ cụm trùng lắp: Nếu cụm A chứa trong cụm B (A là substring liên tục của B), xoá A, giữ B.
+4. Nếu câu toàn vô nghĩa (aaaaa, zzzz), trả [].
+5. Tối đa 6 cụm. Ưu tiên cụm dài, loại bỏ cụm con.
+
+ALGORITHM:
+- Bước 1: Tìm TẤT CẢ chuỗi 2-5 từ liền kề.
+- Bước 2: XÓA BỎ mọi cụm là substring của cụm khác.
+- Bước 3: Giữ tối đa 6 cụm còn lại.
+- Bước 4: Return CHỈ JSON array.
 
 VÍ DỤ:
 Input: "hôm nay tôi vui vẻ và hạnh phúc"
+Candidates: [hôm nay, nay tôi, tôi vui, vui vẻ, vẻ và, và hạnh, hạnh phúc, hôm nay tôi, nay tôi vui, tôi vui vẻ, vui vẻ và, vẻ và hạnh, và hạnh phúc, hôm nay tôi vui, ...]
+After dedup: ["vui vẻ", "hạnh phúc"] (xoá những cụm không ý nghĩa)
 Output: ["vui vẻ", "hạnh phúc"]
-(KHÔNG ["vui vẻ", "hạnh phúc", "vui"] vì "vui" là con của "vui vẻ")
 
-Input: "buồn ngủ, phải nghe nhạc thôi"
-Output: ["buồn ngủ", "phải nghe nhạc"]
-(KHÔNG ["buồn ngủ", "phải nghe", "nghe nhạc", "nghe nhạc thôi"] vì chúng trùng lắp)
+Input: "tui mùn dia quế cup cầu"
+Candidates: [tui mùn, mùn dia, dia quế, cup cầu, tui mùn dia, mùn dia quế, dia quế cup, quế cup cầu, tui mùn dia quế, mùn dia quế cup, dia quế cup cầu, ...]
+Keep meaningful: [tui mùn, mùn dia quế, cup cầu] → xoá "tui mùn" vì nó là substring của "tui mùn dia quế"
+Output: ["mùn dia quế", "cup cầu"]
 
-Input: "hiihihi"
-Output: []
-
-Input: "mệt quá đi"
-Output: ["mệt quá"]`;
+Input: "bữn ngủ, phải nghe nhạc thôi"
+Output: ["bữn ngủ", "phải nghe nhạc", "nhạc thôi"] → Hoặc ["bữn ngủ", "phải nghe nhạc thôi"] (loại substring)`;
 
 class OpenAiProvider implements AiProvider {
   private client: OpenAI;
