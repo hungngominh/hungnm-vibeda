@@ -17,9 +17,11 @@ services:
       JWT_ISSUER: ${JWT_ISSUER:-moodaily}
       JWT_AUDIENCE: ${JWT_AUDIENCE:-moodaily-client}
       PORT: 3000
-      AI_PROVIDER: ${AI_PROVIDER:-gemini}
+      AI_PROVIDER: ${AI_PROVIDER:-vegaproxy}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      VEGAPROXY_API_KEY: ${VEGAPROXY_API_KEY:-}
+      VEGAPROXY_ENDPOINT: ${VEGAPROXY_ENDPOINT:-https://claudinge.allianceitsc.com}
     restart: unless-stopped
     healthcheck:
       test:
