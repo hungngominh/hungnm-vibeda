@@ -97,21 +97,29 @@ class VegaProxyProvider implements AiProvider {
         messages: [
           {
             role: 'user',
-            content: `Câu gốc: ${text}`,
+            content: `Text: ${text}`,
           },
         ],
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`VegaProxy error ${response.status}: ${response.statusText}`);
+      const errorBody = await response.text().catch(() => 'unknown');
+      throw new Error(`VegaProxy error ${response.status}: ${response.statusText} - ${errorBody}`);
     }
 
     const data = (await response.json()) as { content: Array<{ type: string; text: string }> };
     const text_content = data.content.find((c) => c.type === 'text');
-    if (!text_content) return [];
+    if (!text_content) {
+      console.warn('[VegaProxy] No text content in response:', data);
+      return [];
+    }
 
-    return parseClusterResponse(text_content.text);
+    const clusters = parseClusterResponse(text_content.text);
+    if (clusters.length === 0) {
+      console.debug('[VegaProxy] No clusters extracted from text:', text);
+    }
+    return clusters;
   }
 }
 
