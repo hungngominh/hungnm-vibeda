@@ -25,7 +25,7 @@ RULES:
 2. Each cluster = 2-5 adjacent words (no gaps, no punctuation between words).
 3. Remove overlapping clusters: if "a b c" and "b c" both extracted, keep only "a b c".
 4. If input is pure nonsense (aaaaa, zzzz, random gibberish), return [].
-5. Target 2-4 clusters. Avoid including single-word or very short (1-2 word) trivial phrases.
+5. Target 1-4 clusters. If the input is short (2-3 words), the entire input can be a single cluster.
 6. Punctuation (comma, period) acts as a boundary - don't include punctuation marks in clusters.
 
 OUTPUT: Return ONLY a JSON array. NO markdown, NO backticks, NO explanation, NO other text.
@@ -91,7 +91,7 @@ class VegaProxyProvider implements AiProvider {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20241022',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 200,
         system: SYSTEM_PROMPT,
         messages: [
