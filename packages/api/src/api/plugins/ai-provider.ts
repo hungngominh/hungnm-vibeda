@@ -6,6 +6,11 @@ export interface AiProvider {
   extractClusters(text: string): Promise<string[]>;
 }
 
+// Remove unpaired UTF-16 surrogate characters that make JSON.stringify produce invalid UTF-8
+function sanitizeText(text: string): string {
+  return text.replace(/[\uD800-\uDFFF]/g, '');
+}
+
 function parseClusterResponse(raw: string): string[] {
   const clean = raw.replace(/^```json\s*/m, '').replace(/\s*```\s*$/, '').trim();
   const parsed: unknown = JSON.parse(clean);
@@ -83,6 +88,7 @@ class VegaProxyProvider implements AiProvider {
   }
 
   async extractClusters(text: string): Promise<string[]> {
+    const safe = sanitizeText(text);
     const response = await fetch(`${this.endpoint}/v1/messages`, {
       method: 'POST',
       headers: {
@@ -97,7 +103,7 @@ class VegaProxyProvider implements AiProvider {
         messages: [
           {
             role: 'user',
-            content: `Text: ${text}`,
+            content: `Text: ${safe}`,
           },
         ],
       }),
