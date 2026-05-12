@@ -51,9 +51,10 @@ pipeline {
                         -d '{"text": "📦 *[HungNM-VibeDa - 2/3] Deploying container...*"}'
                 """
                 withCredentials([
-                    string(credentialsId: 'VIBEDA_DATABASE_URL', variable: 'DATABASE_URL'),
-                    string(credentialsId: 'VIBEDA_JWT_SECRET',   variable: 'JWT_SECRET'),
-                    string(credentialsId: 'VIBEDA_GEMINI_KEY',   variable: 'GEMINI_API_KEY')
+                    string(credentialsId: 'VIBEDA_DATABASE_URL',  variable: 'DATABASE_URL'),
+                    string(credentialsId: 'VIBEDA_JWT_SECRET',    variable: 'JWT_SECRET'),
+                    string(credentialsId: 'VIBEDA_GEMINI_KEY',    variable: 'GEMINI_API_KEY'),
+                    string(credentialsId: 'VIBEDA_VEGAPROXY_KEY', variable: 'VEGAPROXY_API_KEY')
                 ]) {
                     sh """
                         docker rm -f ${CONTAINER_NAME} 2>/dev/null || true
@@ -62,9 +63,11 @@ pipeline {
                         JWT_ISSUER=moodaily \
                         JWT_AUDIENCE=moodaily-client \
                         PORT=3000 \
-                        AI_PROVIDER=gemini \
+                        AI_PROVIDER=vegaproxy \
                         OPENAI_API_KEY= \
                         GEMINI_API_KEY=\${GEMINI_API_KEY} \
+                        VEGAPROXY_API_KEY=\${VEGAPROXY_API_KEY} \
+                        VEGAPROXY_ENDPOINT=https://claudinge.allianceitsc.com \
                         docker compose up -d --no-build
                     """
                 }
