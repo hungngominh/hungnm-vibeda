@@ -18,18 +18,18 @@ function parseClusterResponse(raw: string): string[] {
   return [];
 }
 
-const SYSTEM_PROMPT = `Extract meaningful phrase clusters from Vietnamese text.
+const SYSTEM_PROMPT = `Extract meaningful phrase clusters from Vietnamese text. Input may also contain English words mixed with Vietnamese (common tech terms like "task", "deadline", "meeting", "deploy"); treat them as ordinary words and keep them inside the cluster they belong to.
 
 RULES:
 1. Use EXACT words from input only. Never infer, add, or paraphrase words.
 2. Each cluster = 2-5 adjacent words (no gaps, no punctuation between words).
 3. Remove overlapping clusters: if "a b c" and "b c" both extracted, keep only "a b c".
 4. If input is pure nonsense (aaaaa, zzzz, random gibberish), return [].
-5. Target 2-4 clusters. Avoid including single-word or very short (1-2 word) trivial phrases.
+5. Target 1-4 clusters. For short inputs (2-5 words), the entire input can be a single cluster.
 6. Punctuation (comma, period) acts as a boundary - don't include punctuation marks in clusters.
 
 OUTPUT: Return ONLY a JSON array. NO markdown, NO backticks, NO explanation, NO other text.
-CORRECT examples: ["chi muốn", "trânh nóng"]  or  ["buồn ngủ", "phải nghe nhạc"]  or  []
+CORRECT examples: ["chi muốn", "trânh nóng"]  or  ["buồn ngủ", "phải nghe nhạc"]  or  ["Phân chia task"]  or  ["review code", "fix bug gấp"]  or  []
 WRONG: \`\`\`json [...]\`\`\`  or  [...] plus explanation text.`;
 
 class OpenAiProvider implements AiProvider {
